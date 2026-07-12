@@ -574,7 +574,9 @@
 
   const today = new Date(); today.setHours(0,0,0,0);
   const isPast = p => new Date(p.end + "T23:59:59") < today;
-  const nextIndex = Math.max(0, PERFORMANCES.findIndex(p => !isPast(p)));
+  const rawNext  = PERFORMANCES.findIndex(p => !isPast(p));
+  const hasNext  = rawNext !== -1;                       /* 모두 지났으면 false */
+  const nextIndex = hasNext ? rawNext : PERFORMANCES.length - 1;
 
   /* ── 캐러셀 생성 ── */
   const track   = document.getElementById("tourTrack");
@@ -614,7 +616,7 @@
     card.dataset.wiki = p.wiki;
     card.setAttribute("aria-label", `공연 #${p.n} ${p.city} — 눌러서 공연장 보기`);
 
-    const isNext = idx === nextIndex;
+    const isNext = hasNext && idx === nextIndex;
     card.innerHTML = `
       <div class="show-bg"></div>
       <span class="show-tag ${isNext ? "next-tag" : ""}">${isNext ? "Next · " : ""}#${p.n}</span>
@@ -655,11 +657,18 @@
   track.addEventListener("scroll", () => requestAnimationFrame(updateNav));
   window.addEventListener("resize", updateNav);
 
-  /* 처음 로드 시 '다음 공연' 위치로 이동 */
-  window.addEventListener("load", () => {
-    track.scrollLeft = nextIndex * cardStep();
+  /* 처음 로드 시 '다음 공연' 카드가 화면 가운데 오도록 이동
+     (오늘 기준: 다음 공연이 #1이면 #1~#3, 모두 끝났으면 마지막 카드들이 보임) */
+  const centerOnNext = () => {
+    const step = cardStep();
+    const visible = Math.max(1, Math.round((track.clientWidth + (step - track.querySelector(".show-card").offsetWidth)) / step));
+    const maxStart = PERFORMANCES.length - visible;
+    let start = nextIndex - Math.floor((visible - 1) / 2);   /* 가운데 배치 */
+    start = Math.max(0, Math.min(start, Math.max(0, maxStart)));
+    track.scrollLeft = start * step;
     updateNav();
-  });
+  };
+  window.addEventListener("load", centerOnNext);
   updateNav();
 
   /* ── 지도 플레이스홀더 ── */
