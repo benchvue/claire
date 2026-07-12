@@ -187,8 +187,8 @@
     transition: opacity .9s ease, transform 1.4s ease;
     pointer-events: none;
   }
-  .show-card.revealed .show-bg{ opacity: .5; transform: scale(1); }   /* 50% */
-  .show-card.revealed::after{
+  .show-card.bg-on .show-bg{ opacity: .5; transform: scale(1); }   /* 50% — 자동 표시 */
+  .show-card::after{
     content:"";
     position: absolute; inset: 0;
     background: linear-gradient(to top, rgba(19,16,17,.85) 8%, transparent 55%);
@@ -568,10 +568,34 @@
   const nextBtn = document.getElementById("nextBtn");
   const counter = document.getElementById("tourCounter");
 
+  /* 화면에 보이는 카드부터 도시 사진을 자동으로 로드 (모바일 데이터 절약) */
+  const bgObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const card = entry.target;
+      bgObserver.unobserve(card);
+      const bgEl = card.querySelector(".show-bg");
+      fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${card.dataset.wiki}`)
+        .then(r => r.json())
+        .then(d => {
+          const url = d.originalimage?.source || d.thumbnail?.source;
+          if (!url) return;
+          const pre = new Image();
+          pre.onload = () => {
+            bgEl.style.backgroundImage = `url("${url}")`;
+            card.classList.add("bg-on");
+          };
+          pre.src = url;
+        })
+        .catch(() => {});
+    });
+  }, { root: track, rootMargin: "0px 400px" });   /* 옆 카드까지 미리 로드 */
+
   PERFORMANCES.forEach((p, idx) => {
     const card = document.createElement("button");
     card.className = "show-card" + (isPast(p) ? " past" : "");
-    card.setAttribute("aria-label", `공연 #${p.n} ${p.city} — 눌러서 도시 사진과 공연장 보기`);
+    card.dataset.wiki = p.wiki;
+    card.setAttribute("aria-label", `공연 #${p.n} ${p.city} — 눌러서 공연장 보기`);
 
     const isNext = idx === nextIndex;
     card.innerHTML = `
@@ -584,24 +608,11 @@
         <div class="show-venue">${p.venue}</div>
       </div>`;
 
-    const bgEl = card.querySelector(".show-bg");
-    let imgUrl = null, loaded = false;
-
-    /* 도시 사진 URL만 미리 받아두고, 실제 이미지는 첫 클릭 때만 로드 (모바일 데이터 절약) */
-    fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${p.wiki}`)
-      .then(r => r.json())
-      .then(d => { imgUrl = d.originalimage?.source || d.thumbnail?.source || null; })
-      .catch(() => {});
-
-    card.addEventListener("click", () => {
-      if (!loaded && imgUrl) {
-        bgEl.style.backgroundImage = `url("${imgUrl}")`;
-        loaded = true;
-      }
-      card.classList.toggle("revealed");
-    });
+    /* 클릭은 공연장 이름 표시/숨김만 담당 */
+    card.addEventListener("click", () => card.classList.toggle("revealed"));
 
     track.appendChild(card);
+    bgObserver.observe(card);
   });
 
   /* ── 화살표 / 카운터 ── */
@@ -664,6 +675,23 @@
     return "data:image/svg+xml," + svg;
   };
 
+  /* GitHub Pages는 파일명 대소문자를 구분하므로,
+     여러 확장자/대소문자 조합을 순서대로 시도해서 있는 파일을 자동으로 찾음 */
+  const EXT_CANDIDATES = ["webp","WEBP","Webp","jpg","JPG","jpeg","JPEG","png","PNG"];
+
+  function attachSmartSrc(img, base, label, front){
+    let k = 0;
+    img.onerror = () => {
+      if (k < EXT_CANDIDATES.length){
+        img.src = `${base}.${EXT_CANDIDATES[k++]}`;
+      } else {
+        img.onerror = null;
+        img.src = placeholder(label, front, false);
+      }
+    };
+    img.src = `${base}.${EXT_CANDIDATES[k++]}`;
+  }
+
   for (let i = 1; i <= TOTAL_CARDS; i++) {
     const card = document.createElement("button");
     card.className = "card";
@@ -672,17 +700,18 @@
     card.innerHTML = `
       <div class="card-inner">
         <div class="face front">
-          <img src="${IMG_PATH}front_${i}.WEBP" alt="Claire Kwon — 카드 ${i} 앞면" loading="lazy"
-               onerror="this.onerror=null;this.src=placeholder('front_${i}.WEBP', true, false)">
+          <img alt="Claire Kwon — 카드 ${i} 앞면" loading="lazy">
           <span class="num">No.&nbsp;${String(i).padStart(2,"0")}</span>
           <span class="hint">Tap to flip</span>
         </div>
         <div class="face back">
-          <img src="${IMG_PATH}back_${i}.WEBP" alt="Claire Kwon — 카드 ${i} 뒷면" loading="lazy"
-               onerror="this.onerror=null;this.src=placeholder('back_${i}.WEBP', false, false)">
+          <img alt="Claire Kwon — 카드 ${i} 뒷면" loading="lazy">
           <span class="num">No.&nbsp;${String(i).padStart(2,"0")}</span>
         </div>
       </div>`;
+
+    attachSmartSrc(card.querySelector(".front img"), `${IMG_PATH}front_${i}`, `front_${i}`, true);
+    attachSmartSrc(card.querySelector(".back img"),  `${IMG_PATH}back_${i}`,  `back_${i}`,  false);
 
     card.addEventListener("click", () => card.classList.toggle("flipped"));
     gallery.appendChild(card);
