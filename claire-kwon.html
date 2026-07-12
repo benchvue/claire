@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claire Kwon — Musical Actress</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Noto+Serif+KR:wght@300;500&family=Noto+Sans+KR:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:        #131011;
+    --bg-soft:   #1c1719;
+    --ink:       #f2ece2;
+    --gold:      #c9a45c;
+    --gold-dim:  #8a7040;
+    --muted:     #9b9089;
+    --card-border: rgba(201,164,92,.55);
+    --radius: 22px;
+    --gap: clamp(16px, 2.5vw, 32px);
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+
+  body{
+    background:
+      radial-gradient(1200px 600px at 50% -200px, rgba(201,164,92,.10), transparent 60%),
+      var(--bg);
+    color: var(--ink);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+  }
+
+  /* ── 헤더 ───────────────────────────── */
+  header{
+    text-align: center;
+    padding: clamp(50px, 9vw, 100px) 20px 26px;
+  }
+  .eyebrow{
+    font-family: 'Noto Serif KR', serif;
+    font-size: 13px;
+    letter-spacing: .55em;
+    text-indent: .55em;
+    color: var(--gold);
+    text-transform: uppercase;
+  }
+  h1{
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    font-size: clamp(46px, 8vw, 92px);
+    letter-spacing: .06em;
+    line-height: 1.05;
+    margin-top: 14px;
+  }
+  .tagline{
+    margin-top: 16px;
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 300;
+    font-size: 15px;
+    color: var(--muted);
+  }
+  .rule{
+    width: 72px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 30px auto 0;
+  }
+
+  /* ── 섹션 제목 ───────────────────────── */
+  .section-head{ text-align:center; padding: 44px 20px 6px; }
+  .section-eyebrow{
+    font-size: 11.5px;
+    letter-spacing: .45em;
+    text-indent: .45em;
+    color: var(--gold);
+    text-transform: uppercase;
+  }
+  .section-title{
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    font-style: italic;
+    font-size: clamp(28px, 5vw, 42px);
+    letter-spacing: .1em;
+    margin-top: 8px;
+  }
+  .section-title-kr{
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 300;
+    font-size: clamp(14px, 2.4vw, 17px);
+    letter-spacing: .35em;
+    text-indent: .35em;
+    color: var(--muted);
+    margin-top: 10px;
+  }
+  .section-sub{
+    font-size: 12px;
+    letter-spacing: .3em;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    margin-top: 12px;
+  }
+
+  /* ── 투어 지도 ───────────────────────── */
+  .tour-map{
+    max-width: 1180px;
+    margin: 20px auto 6px;
+    padding: 0 clamp(18px, 4vw, 48px);
+  }
+  .tour-map button{
+    display: block; width: 100%;
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    padding: 0; background: var(--bg-soft);
+    cursor: zoom-in;
+    box-shadow:
+      0 0 0 5px rgba(19,16,17,1),
+      0 0 0 6px rgba(201,164,92,.28),
+      0 24px 50px -18px rgba(0,0,0,.75);
+    transition: translate .4s ease;
+  }
+  @media (hover:hover){ .tour-map button:hover{ translate: 0 -5px; } }
+  .tour-map img{ display:block; width:100%; height:auto; }
+  .tour-map .map-caption{
+    text-align:center;
+    font-size: 11px;
+    letter-spacing: .28em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 12px 0 0;
+  }
+
+  /* ── 투어 캐러셀 ─────────────────────
+     모바일 1장 / 태블릿 2장 / PC 3장, 스와이프 + 화살표 */
+  .tour-wrap{
+    position: relative;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 26px clamp(18px, 4vw, 48px) 8px;
+  }
+  .tour-track{
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: calc((100% - 2 * var(--gap)) / 3);
+    gap: var(--gap);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    padding: 8px 6px 16px;
+  }
+  .tour-track::-webkit-scrollbar{ display: none; }
+  @media (max-width: 1024px){
+    .tour-track{ grid-auto-columns: calc((100% - var(--gap)) / 2); }
+  }
+  @media (max-width: 640px){
+    .tour-track{ grid-auto-columns: 100%; }   /* 핸드폰: 1장씩 */
+  }
+
+  .show-card{
+    position: relative;
+    scroll-snap-align: start;
+    border: 0; padding: 0;
+    background: var(--bg-soft);
+    aspect-ratio: 16 / 11;
+    border-radius: var(--radius);
+    overflow: hidden;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    border: 1px solid var(--card-border);
+    box-shadow:
+      0 0 0 5px rgba(19,16,17,1),
+      0 0 0 6px rgba(201,164,92,.28),
+      0 24px 50px -18px rgba(0,0,0,.75);
+    color: var(--ink);
+    text-align: left;
+  }
+  .show-card:focus-visible{ outline: 2px solid var(--gold); outline-offset: 8px; }
+  .show-card.past{ filter: grayscale(.5) brightness(.7); }
+
+  .show-bg{
+    position: absolute; inset: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transform: scale(1.06);
+    transition: opacity .9s ease, transform 1.4s ease;
+    pointer-events: none;
+  }
+  .show-card.revealed .show-bg{ opacity: .5; transform: scale(1); }   /* 50% */
+  .show-card.revealed::after{
+    content:"";
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(19,16,17,.85) 8%, transparent 55%);
+    pointer-events: none;
+  }
+
+  .show-body{
+    position: relative; z-index: 2;
+    height: 100%;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: clamp(18px, 2.6vw, 26px);
+  }
+  .show-tag{
+    position: absolute; top: 14px; left: 16px;
+    font-size: 10.5px;
+    letter-spacing: .3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    border: 1px solid var(--gold-dim);
+    border-radius: 999px;
+    padding: 6px 12px 5px;
+    background: rgba(19,16,17,.55);
+    backdrop-filter: blur(3px);
+    z-index: 3;
+  }
+  .show-tag.next-tag{ color:#131011; background: var(--gold); border-color: var(--gold); }
+  .show-city{
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(24px, 3.2vw, 32px);
+    letter-spacing: .04em;
+    line-height: 1.1;
+    text-shadow: 0 2px 14px rgba(0,0,0,.8);
+  }
+  .show-date{
+    margin-top: 6px;
+    font-size: 12px;
+    letter-spacing: .2em;
+    color: var(--gold);
+    text-transform: uppercase;
+    text-shadow: 0 1px 8px rgba(0,0,0,.8);
+  }
+  .show-venue{
+    margin-top: 8px;
+    font-family: 'Noto Serif KR', serif;
+    font-size: 13.5px;
+    max-height: 0; opacity: 0; overflow: hidden;
+    transition: max-height .6s ease, opacity .6s ease .15s;
+    text-shadow: 0 1px 8px rgba(0,0,0,.85);
+  }
+  .show-card.revealed .show-venue{ max-height: 60px; opacity: 1; }
+  .show-hint{
+    position: absolute; top: 18px; right: 16px;
+    font-size: 10px;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: rgba(242,236,226,.55);
+    transition: opacity .4s ease;
+    z-index: 3;
+  }
+  .show-card.revealed .show-hint{ opacity: 0; }
+
+  /* 좌우 화살표 — 모바일에서도 누르기 쉬운 크기 */
+  .arrow{
+    position: absolute;
+    top: 50%;
+    translate: 0 -50%;
+    width: 46px; height: 46px;
+    border-radius: 50%;
+    border: 1px solid var(--gold-dim);
+    background: rgba(19,16,17,.75);
+    backdrop-filter: blur(4px);
+    color: var(--gold);
+    cursor: pointer;
+    display: grid; place-items: center;
+    z-index: 5;
+    transition: background .25s ease, opacity .3s ease;
+  }
+  .arrow svg{ width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+  .arrow:hover{ background: rgba(201,164,92,.9); color:#131011; }
+  .arrow:disabled{ opacity: .25; cursor: default; background: rgba(19,16,17,.75); color: var(--gold); }
+  .arrow.prev{ left: clamp(2px, 1vw, 14px); }
+  .arrow.next{ right: clamp(2px, 1vw, 14px); }
+
+  /* 진행 표시 (n / 32) */
+  .tour-counter{
+    text-align: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 15px;
+    letter-spacing: .2em;
+    color: var(--muted);
+    padding: 4px 0 20px;
+  }
+  .tour-counter b{ color: var(--gold); font-weight: 600; }
+
+  /* ── 카드 그리드 ───────────────────── */
+  .gallery{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: clamp(22px, 3vw, 40px);
+    max-width: 1480px;
+    margin: 0 auto;
+    padding: 30px clamp(18px, 4vw, 48px) 70px;
+  }
+  @media (max-width: 480px){ .gallery{ grid-template-columns: 1fr; } }
+
+  .video-gallery{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: clamp(22px, 3vw, 40px);
+    max-width: 1480px;
+    margin: 0 auto;
+    padding: 30px clamp(18px, 4vw, 48px) 90px;
+  }
+  @media (max-width: 480px){ .video-gallery{ grid-template-columns: 1fr; } }
+
+  /* ── 플립 카드 ──────────────────────── */
+  .card{
+    perspective: 1400px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    border: 0; background: none; padding: 0;
+    display: block; width: 100%;
+  }
+  .card-inner{
+    position: relative; width: 100%;
+    aspect-ratio: 2 / 3;
+    transform-style: preserve-3d;
+    transition: transform .8s cubic-bezier(.2,.7,.25,1);
+  }
+  .card.flipped .card-inner{ transform: rotateY(180deg); }
+  .face{
+    position: absolute; inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--card-border);
+    box-shadow:
+      0 0 0 5px rgba(19,16,17,1),
+      0 0 0 6px rgba(201,164,92,.28),
+      0 24px 50px -18px rgba(0,0,0,.75);
+    background: var(--bg-soft);
+  }
+  .face img{
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+    transition: transform .6s ease;
+  }
+  .back{ transform: rotateY(180deg); }
+
+  @media (hover:hover){
+    .card:hover .face img{ transform: scale(1.04); }
+    .card:hover .card-inner{ translate: 0 -6px; }
+    .vcard:hover .thumb video,
+    .vcard:hover .thumb img{ transform: scale(1.04); }
+    .vcard:hover{ translate: 0 -6px; }
+    .vcard:hover .play{ background: rgba(201,164,92,.92); }
+    .vcard:hover .play svg{ fill: #131011; }
+  }
+  .card:focus-visible .face,
+  .vcard:focus-visible .thumb{ outline: 2px solid var(--gold); outline-offset: 8px; }
+
+  .num{
+    position: absolute; left: 16px; bottom: 14px; z-index: 2;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-size: 15px;
+    letter-spacing: .15em; color: var(--ink);
+    text-shadow: 0 1px 8px rgba(0,0,0,.8);
+    pointer-events: none;
+  }
+  .hint{
+    position: absolute; right: 16px; bottom: 14px; z-index: 2;
+    font-size: 11px; letter-spacing: .25em;
+    color: rgba(242,236,226,.75);
+    text-shadow: 0 1px 8px rgba(0,0,0,.8);
+    pointer-events: none; text-transform: uppercase;
+  }
+
+  /* ── 비디오 카드 ─────────────────────── */
+  .vcard{
+    border: 0; background: none; padding: 0;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    display: block; width: 100%;
+    transition: translate .4s ease;
+  }
+  .thumb{
+    position: relative; width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--card-border);
+    box-shadow:
+      0 0 0 5px rgba(19,16,17,1),
+      0 0 0 6px rgba(201,164,92,.28),
+      0 24px 50px -18px rgba(0,0,0,.75);
+    background: var(--bg-soft);
+  }
+  .thumb video, .thumb img{
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+    transition: transform .6s ease;
+    pointer-events: none;
+  }
+  .play{
+    position: absolute; top: 50%; left: 50%;
+    translate: -50% -50%;
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: rgba(19,16,17,.55);
+    border: 1.5px solid var(--gold);
+    backdrop-filter: blur(4px);
+    display: grid; place-items: center;
+    transition: background .3s ease;
+    z-index: 2; pointer-events: none;
+  }
+  .play svg{ width: 22px; height: 22px; fill: var(--gold); margin-left: 4px; transition: fill .3s ease; }
+
+  /* ── 라이트박스 (영상 + 지도 확대) ────── */
+  .lightbox{
+    position: fixed; inset: 0;
+    background: rgba(10,8,9,.94);
+    display: none;
+    align-items: center; justify-content: center;
+    z-index: 100;
+    padding: 20px;
+  }
+  .lightbox.open{ display: flex; }
+  .lightbox video, .lightbox img{
+    max-width: min(1200px, 100%);
+    max-height: 86vh;
+    border-radius: 14px;
+    border: 1px solid var(--card-border);
+    box-shadow: 0 30px 80px -20px rgba(0,0,0,.9);
+    background: #000;
+    display: none;
+  }
+  .lightbox video.active, .lightbox img.active{ display: block; }
+  .close-btn{
+    position: absolute; top: 20px; right: 22px;
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    border: 1px solid var(--gold-dim);
+    background: rgba(19,16,17,.6);
+    color: var(--ink);
+    font-size: 20px;
+    cursor: pointer;
+    display: grid; place-items: center;
+    transition: background .25s ease;
+  }
+  .close-btn:hover{ background: rgba(201,164,92,.25); }
+
+  footer{
+    text-align: center;
+    padding: 0 20px 70px;
+    color: var(--muted);
+    font-size: 12.5px;
+    letter-spacing: .18em;
+  }
+  footer .gold{ color: var(--gold-dim); }
+
+  @media (prefers-reduced-motion: reduce){
+    .card-inner, .face img, .thumb video, .thumb img, .vcard,
+    .show-bg, .show-venue, .show-card, .tour-map button{ transition: none; }
+    .tour-track{ scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <p class="eyebrow">Musical Actress</p>
+  <h1>CLAIRE&nbsp;KWON</h1>
+  <p class="tagline">뮤지컬 배우 클레어 권 · 무대 위의 순간들</p>
+  <div class="rule"></div>
+</header>
+
+<!-- ══════════ 클레어 순회 공연 일정 ══════════ -->
+<div class="section-head">
+  <p class="section-eyebrow">2026 – 2027 North American Tour</p>
+  <h2 class="section-title">Claire on Tour</h2>
+  <p class="section-title-kr">클레어 순회 공연 일정</p>
+  <p class="section-sub">swipe or use arrows · tap a card for city &amp; venue</p>
+</div>
+
+<!-- 전체 일정 지도 -->
+<div class="tour-map">
+  <button id="mapBtn" aria-label="투어 지도 크게 보기">
+    <img src="images/map-1.png" alt="2026–2027 북미 투어 전체 일정 지도"
+         onerror="this.onerror=null;this.src=mapPlaceholder()">
+  </button>
+  <p class="map-caption">Full tour route · tap to enlarge</p>
+</div>
+
+<!-- 공연 카드 캐러셀 -->
+<div class="tour-wrap">
+  <button class="arrow prev" id="prevBtn" aria-label="이전 공연">
+    <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
+  </button>
+  <div class="tour-track" id="tourTrack"></div>
+  <button class="arrow next" id="nextBtn" aria-label="다음 공연">
+    <svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+  </button>
+</div>
+<p class="tour-counter" id="tourCounter"></p>
+
+<!-- ══════════ 포토카드 ══════════ -->
+<div class="section-head">
+  <h2 class="section-title">Photocards</h2>
+  <p class="section-sub">tap a card to flip</p>
+</div>
+<main class="gallery" id="gallery"></main>
+
+<!-- ══════════ 무대 영상 ══════════ -->
+<div class="section-head">
+  <h2 class="section-title">On Stage</h2>
+  <p class="section-sub">tap to play</p>
+</div>
+<section class="video-gallery" id="videoGallery"></section>
+
+<footer>
+  <span class="gold">©</span> 2026 CLAIRE KWON &nbsp;·&nbsp; ALL RIGHTS RESERVED
+</footer>
+
+<div class="lightbox" id="lightbox">
+  <button class="close-btn" id="closeBtn" aria-label="닫기">✕</button>
+  <video id="lightboxVideo" controls playsinline></video>
+  <img id="lightboxImg" alt="투어 지도 확대">
+</div>
+
+<script>
+  /* ══════════════ 공연 일정 (전체) ══════════════
+     wiki: 영문 위키피디아 문서 제목 → 도시 대표 사진 자동 로드 */
+  const PERFORMANCES = [
+    { n:1,  city:"Baltimore, MD",     start:"2026-09-13", end:"2026-09-19", dates:"Sep 13 – Sep 19 2026", venue:"The Hippodrome Theatre",                        wiki:"Baltimore" },
+    { n:2,  city:"Greensboro, NC",    start:"2026-09-22", end:"2026-09-27", dates:"Sep 22 – Sep 27 2026", venue:"Steven Tanger Center for the Performing Arts",  wiki:"Greensboro,_North_Carolina" },
+    { n:3,  city:"Greenville, SC",    start:"2026-09-29", end:"2026-10-04", dates:"Sep 29 – Oct 4 2026",  venue:"Peace Center Concert Hall",                     wiki:"Greenville,_South_Carolina" },
+    { n:4,  city:"Washington, DC",    start:"2026-10-06", end:"2026-10-11", dates:"Oct 6 – Oct 11 2026",  venue:"The National Theatre",                          wiki:"Washington,_D.C." },
+    { n:5,  city:"Durham, NC",        start:"2026-10-13", end:"2026-10-18", dates:"Oct 13 – Oct 18 2026", venue:"Durham Performing Arts Center",                 wiki:"Durham,_North_Carolina" },
+    { n:6,  city:"Detroit, MI",       start:"2026-10-20", end:"2026-11-01", dates:"Oct 20 – Nov 1 2026",  venue:"Fisher Theatre",                                wiki:"Detroit" },
+    { n:7,  city:"Columbus, OH",      start:"2026-11-03", end:"2026-11-08", dates:"Nov 3 – Nov 8 2026",   venue:"Ohio Theatre",                                  wiki:"Columbus,_Ohio" },
+    { n:8,  city:"Grand Rapids, MI",  start:"2026-11-10", end:"2026-11-15", dates:"Nov 10 – Nov 15 2026", venue:"DeVos Performance Hall",                        wiki:"Grand_Rapids,_Michigan" },
+    { n:9,  city:"Minneapolis, MN",   start:"2026-11-17", end:"2026-11-22", dates:"Nov 17 – Nov 22 2026", venue:"Orpheum Theatre",                               wiki:"Minneapolis" },
+    { n:10, city:"Madison, WI",       start:"2026-11-24", end:"2026-11-29", dates:"Nov 24 – Nov 29 2026", venue:"Overture Center for the Arts",                  wiki:"Madison,_Wisconsin" },
+    { n:11, city:"Des Moines, IA",    start:"2026-12-01", end:"2026-12-06", dates:"Dec 1 – Dec 6 2026",   venue:"Des Moines Civic Center",                       wiki:"Des_Moines,_Iowa" },
+    { n:12, city:"Omaha, NE",         start:"2026-12-08", end:"2026-12-13", dates:"Dec 8 – Dec 13 2026",  venue:"Orpheum Theater",                               wiki:"Omaha,_Nebraska" },
+    { n:13, city:"Appleton, WI",      start:"2026-12-15", end:"2026-12-20", dates:"Dec 15 – Dec 20 2026", venue:"Fox Cities Performing Arts Center",             wiki:"Appleton,_Wisconsin" },
+    { n:14, city:"Pittsburgh, PA",    start:"2026-12-29", end:"2027-01-03", dates:"Dec 29 – Jan 3 2027",  venue:"Benedum Center",                                wiki:"Pittsburgh" },
+    { n:15, city:"Chicago, IL",       start:"2027-01-05", end:"2027-01-17", dates:"Jan 5 – Jan 17 2027",  venue:"CIBC Theatre",                                  wiki:"Chicago" },
+    { n:16, city:"Cincinnati, OH",    start:"2027-01-19", end:"2027-01-31", dates:"Jan 19 – Jan 31 2027", venue:"Aronoff Center",                                wiki:"Cincinnati" },
+    { n:17, city:"Boston, MA",        start:"2027-02-02", end:"2027-02-14", dates:"Feb 2 – Feb 14 2027",  venue:"Citizens Opera House",                          wiki:"Boston" },
+    { n:18, city:"Hartford, CT",      start:"2027-02-16", end:"2027-02-21", dates:"Feb 16 – Feb 21 2027", venue:"The Bushnell Performing Arts Center",           wiki:"Hartford,_Connecticut" },
+    { n:19, city:"Providence, RI",    start:"2027-02-23", end:"2027-02-28", dates:"Feb 23 – Feb 28 2027", venue:"Providence Performing Arts Center",             wiki:"Providence,_Rhode_Island" },
+    { n:20, city:"Cleveland, OH",     start:"2027-03-02", end:"2027-03-21", dates:"Mar 2 – Mar 21 2027",  venue:"Connor Palace",                                 wiki:"Cleveland" },
+    { n:21, city:"Philadelphia, PA",  start:"2027-03-23", end:"2027-04-04", dates:"Mar 23 – Apr 4 2027",  venue:"Academy of Music",                              wiki:"Philadelphia" },
+    { n:22, city:"Louisville, KY",    start:"2027-04-06", end:"2027-04-11", dates:"Apr 6 – Apr 11 2027",  venue:"The Kentucky Center",                           wiki:"Louisville,_Kentucky" },
+    { n:23, city:"St. Louis, MO",     start:"2027-04-13", end:"2027-04-25", dates:"Apr 13 – Apr 25 2027", venue:"The Fabulous Fox",                              wiki:"St._Louis" },
+    { n:24, city:"Salt Lake, UT",     start:"2027-04-27", end:"2027-05-02", dates:"Apr 27 – May 2 2027",  venue:"The George S. and Dolores Doré Eccles Theater", wiki:"Salt_Lake_City" },
+    { n:25, city:"Los Angeles, CA",   start:"2027-05-04", end:"2027-05-23", dates:"May 4 – May 23 2027",  venue:"Pantages Theatre",                              wiki:"Los_Angeles" },
+    { n:26, city:"San Diego, CA",     start:"2027-06-01", end:"2027-06-06", dates:"Jun 1 – Jun 6 2027",   venue:"San Diego Civic Theatre",                       wiki:"San_Diego" },
+    { n:27, city:"Las Vegas, NV",     start:"2027-06-08", end:"2027-06-13", dates:"Jun 8 – Jun 13 2027",  venue:"Reynolds Hall",                                 wiki:"Las_Vegas" },
+    { n:28, city:"Costa Mesa, CA",    start:"2027-06-15", end:"2027-06-27", dates:"Jun 15 – Jun 27 2027", venue:"Segerstrom Hall",                               wiki:"Costa_Mesa,_California" },
+    { n:29, city:"San Francisco, CA", start:"2027-06-29", end:"2027-07-18", dates:"Jun 29 – Jul 18 2027", venue:"Orpheum Theatre",                               wiki:"San_Francisco" },
+    { n:30, city:"Seattle, WA",       start:"2027-07-21", end:"2027-08-01", dates:"Jul 21 – Aug 1 2027",  venue:"The 5th Avenue Theatre",                        wiki:"Seattle" },
+    { n:31, city:"Sacramento, CA",    start:"2027-08-10", end:"2027-08-15", dates:"Aug 10 – Aug 15 2027", venue:"SAFE Credit Union Performing Arts Center",      wiki:"Sacramento,_California" },
+    { n:32, city:"Denver, CO",        start:"2027-08-18", end:"2027-08-29", dates:"Aug 18 – Aug 29 2027", venue:"Buell Theatre",                                 wiki:"Denver" },
+  ];
+
+  const today = new Date(); today.setHours(0,0,0,0);
+  const isPast = p => new Date(p.end + "T23:59:59") < today;
+  const nextIndex = Math.max(0, PERFORMANCES.findIndex(p => !isPast(p)));
+
+  /* ── 캐러셀 생성 ── */
+  const track   = document.getElementById("tourTrack");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const counter = document.getElementById("tourCounter");
+
+  PERFORMANCES.forEach((p, idx) => {
+    const card = document.createElement("button");
+    card.className = "show-card" + (isPast(p) ? " past" : "");
+    card.setAttribute("aria-label", `공연 #${p.n} ${p.city} — 눌러서 도시 사진과 공연장 보기`);
+
+    const isNext = idx === nextIndex;
+    card.innerHTML = `
+      <div class="show-bg"></div>
+      <span class="show-tag ${isNext ? "next-tag" : ""}">${isNext ? "Next · " : ""}#${p.n}</span>
+      <span class="show-hint">Tap for venue</span>
+      <div class="show-body">
+        <div class="show-city">${p.city}</div>
+        <div class="show-date">${p.dates}</div>
+        <div class="show-venue">${p.venue}</div>
+      </div>`;
+
+    const bgEl = card.querySelector(".show-bg");
+    let imgUrl = null, loaded = false;
+
+    /* 도시 사진 URL만 미리 받아두고, 실제 이미지는 첫 클릭 때만 로드 (모바일 데이터 절약) */
+    fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${p.wiki}`)
+      .then(r => r.json())
+      .then(d => { imgUrl = d.originalimage?.source || d.thumbnail?.source || null; })
+      .catch(() => {});
+
+    card.addEventListener("click", () => {
+      if (!loaded && imgUrl) {
+        bgEl.style.backgroundImage = `url("${imgUrl}")`;
+        loaded = true;
+      }
+      card.classList.toggle("revealed");
+    });
+
+    track.appendChild(card);
+  });
+
+  /* ── 화살표 / 카운터 ── */
+  const cardStep = () => {
+    const first = track.querySelector(".show-card");
+    const gap = parseFloat(getComputedStyle(track).columnGap) || 0;
+    return first ? first.offsetWidth + gap : 300;
+  };
+  prevBtn.addEventListener("click", () => track.scrollBy({ left: -cardStep() }));
+  nextBtn.addEventListener("click", () => track.scrollBy({ left:  cardStep() }));
+
+  const updateNav = () => {
+    const max = track.scrollWidth - track.clientWidth - 2;
+    prevBtn.disabled = track.scrollLeft <= 2;
+    nextBtn.disabled = track.scrollLeft >= max;
+    const idx = Math.min(PERFORMANCES.length, Math.round(track.scrollLeft / cardStep()) + 1);
+    counter.innerHTML = `<b>#${idx}</b> / ${PERFORMANCES.length}`;
+  };
+  track.addEventListener("scroll", () => requestAnimationFrame(updateNav));
+  window.addEventListener("resize", updateNav);
+
+  /* 처음 로드 시 '다음 공연' 위치로 이동 */
+  window.addEventListener("load", () => {
+    track.scrollTo({ left: nextIndex * cardStep(), behavior: "instant" in track ? "instant" : "auto" });
+    updateNav();
+  });
+  updateNav();
+
+  /* ── 지도 플레이스홀더 ── */
+  function mapPlaceholder(){
+    const svg =
+      `<svg xmlns='http://www.w3.org/2000/svg' width='1536' height='700'>` +
+      `<rect width='100%25' height='100%25' fill='%231c1719'/>` +
+      `<rect x='30' y='30' width='1476' height='640' fill='none' stroke='%23c9a45c' stroke-opacity='.35' stroke-width='2' rx='14'/>` +
+      `<text x='50%25' y='46%25' fill='%23c9a45c' font-family='Georgia' font-size='52' font-style='italic' text-anchor='middle'>Tour Map</text>` +
+      `<text x='50%25' y='56%25' fill='%239b9089' font-family='monospace' font-size='30' text-anchor='middle'>images/map-1.png</text>` +
+      `</svg>`;
+    return "data:image/svg+xml," + svg;
+  }
+
+  /* ══════════════ 포토카드 (18장) / 영상 (6개) ══════════════ */
+  const TOTAL_CARDS  = 18;
+  const TOTAL_VIDEOS = 6;
+  const IMG_PATH   = "images/";
+  const VIDEO_PATH = "videos/";
+
+  const gallery      = document.getElementById("gallery");
+  const videoGallery = document.getElementById("videoGallery");
+
+  const placeholder = (label, front, wide) => {
+    const c1 = front ? "%231c1719" : "%23241a10";
+    const w = wide ? 1280 : 800, h = wide ? 720 : 1200;
+    const svg =
+      `<svg xmlns='http://www.w3.org/2000/svg' width='${w}' height='${h}'>` +
+      `<rect width='100%25' height='100%25' fill='${c1}'/>` +
+      `<rect x='30' y='30' width='${w-60}' height='${h-60}' fill='none' stroke='%23c9a45c' stroke-opacity='.35' stroke-width='2' rx='14'/>` +
+      `<text x='50%25' y='47%25' fill='%23c9a45c' font-family='Georgia' font-size='44' font-style='italic' text-anchor='middle'>Claire Kwon</text>` +
+      `<text x='50%25' y='56%25' fill='%239b9089' font-family='monospace' font-size='30' text-anchor='middle'>${label}</text>` +
+      `</svg>`;
+    return "data:image/svg+xml," + svg;
+  };
+
+  for (let i = 1; i <= TOTAL_CARDS; i++) {
+    const card = document.createElement("button");
+    card.className = "card";
+    card.setAttribute("aria-label", `카드 ${i} — 눌러서 뒤집기`);
+
+    card.innerHTML = `
+      <div class="card-inner">
+        <div class="face front">
+          <img src="${IMG_PATH}front_${i}.WEBP" alt="Claire Kwon — 카드 ${i} 앞면" loading="lazy"
+               onerror="this.onerror=null;this.src=placeholder('front_${i}.WEBP', true, false)">
+          <span class="num">No.&nbsp;${String(i).padStart(2,"0")}</span>
+          <span class="hint">Tap to flip</span>
+        </div>
+        <div class="face back">
+          <img src="${IMG_PATH}back_${i}.WEBP" alt="Claire Kwon — 카드 ${i} 뒷면" loading="lazy"
+               onerror="this.onerror=null;this.src=placeholder('back_${i}.WEBP', false, false)">
+          <span class="num">No.&nbsp;${String(i).padStart(2,"0")}</span>
+        </div>
+      </div>`;
+
+    card.addEventListener("click", () => card.classList.toggle("flipped"));
+    gallery.appendChild(card);
+  }
+
+  const playIcon = `
+    <span class="play" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+    </span>`;
+
+  const lightbox      = document.getElementById("lightbox");
+  const lightboxVideo = document.getElementById("lightboxVideo");
+  const lightboxImg   = document.getElementById("lightboxImg");
+  const closeBtn      = document.getElementById("closeBtn");
+
+  for (let i = 1; i <= TOTAL_VIDEOS; i++) {
+    const src = `${VIDEO_PATH}video_${i}.mp4`;
+    const vcard = document.createElement("button");
+    vcard.className = "vcard";
+    vcard.setAttribute("aria-label", `영상 ${i} 재생`);
+
+    vcard.innerHTML = `
+      <div class="thumb">
+        <video preload="metadata" muted playsinline src="${src}#t=0.1"></video>
+        ${playIcon}
+        <span class="num">Clip&nbsp;${String(i).padStart(2,"0")}</span>
+      </div>`;
+
+    const vid = vcard.querySelector("video");
+    vid.addEventListener("error", () => {
+      const img = document.createElement("img");
+      img.src = placeholder(`video_${i}.mp4`, true, true);
+      img.alt = `영상 ${i} 플레이스홀더`;
+      vid.replaceWith(img);
+    });
+
+    vcard.addEventListener("click", () => {
+      lightboxImg.classList.remove("active");
+      lightboxVideo.classList.add("active");
+      lightboxVideo.src = src;
+      lightbox.classList.add("open");
+      lightboxVideo.play().catch(()=>{});
+    });
+
+    videoGallery.appendChild(vcard);
+  }
+
+  /* 지도 확대 보기 */
+  document.getElementById("mapBtn").addEventListener("click", () => {
+    lightboxVideo.classList.remove("active");
+    lightboxImg.src = document.querySelector(".tour-map img").src;
+    lightboxImg.classList.add("active");
+    lightbox.classList.add("open");
+  });
+
+  const closeLightbox = () => {
+    lightbox.classList.remove("open");
+    lightboxVideo.pause();
+    lightboxVideo.removeAttribute("src");
+    lightboxVideo.load();
+    lightboxVideo.classList.remove("active");
+    lightboxImg.classList.remove("active");
+  };
+  closeBtn.addEventListener("click", closeLightbox);
+  lightbox.addEventListener("click", e => { if (e.target === lightbox) closeLightbox(); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape") closeLightbox(); });
+</script>
+
+</body>
+</html>
