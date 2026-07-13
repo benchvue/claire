@@ -287,6 +287,121 @@
   }
   .tour-counter b{ color: var(--gold); font-weight: 600; }
 
+  /* ── 누적 마일리지 카드 ─────────────── */
+  .mileage-wrap{
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 4px clamp(18px, 4vw, 48px) 20px;
+  }
+  .mileage-card{
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    background: var(--bg-soft);
+    box-shadow:
+      0 0 0 5px rgba(19,16,17,1),
+      0 0 0 6px rgba(201,164,92,.28),
+      0 24px 50px -18px rgba(0,0,0,.75);
+    padding: clamp(20px, 3.4vw, 34px) clamp(18px, 3.4vw, 34px) clamp(16px, 2.6vw, 24px);
+  }
+  .mileage-title{
+    text-align: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: clamp(19px, 3vw, 24px);
+    letter-spacing: .14em;
+    color: var(--ink);
+  }
+  .mileage-sub{
+    text-align: center;
+    font-size: 11px;
+    letter-spacing: .28em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-top: 6px;
+  }
+  .mileage-card{ cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  /* 비행기·자동차를 세로로 쌓아 폰 한 화면에 모두 보이도록 */
+  .mileage-grid{
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(10px, 1.8vw, 14px);
+    margin-top: clamp(16px, 2.6vw, 22px);
+  }
+  .stat{
+    display: flex;
+    align-items: center;
+    gap: clamp(12px, 2vw, 18px);
+    border: 1px solid rgba(201,164,92,.22);
+    border-radius: 16px;
+    padding: clamp(11px, 1.8vw, 16px) clamp(14px, 2.2vw, 20px);
+    background: rgba(19,16,17,.45);
+  }
+  .stat-icon{
+    flex: 0 0 auto;
+    width: 46px; height: 46px;
+    border-radius: 50%;
+    border: 1.5px solid var(--gold);
+    display: grid; place-items: center;
+    background: rgba(201,164,92,.08);
+  }
+  .stat-icon svg{
+    width: 23px; height: 23px;
+    fill: none; stroke: var(--gold);
+    stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .stat-label{
+    flex: 1;
+    font-size: 10.5px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    line-height: 1.6;
+  }
+  .stat-value{ text-align: right; }
+  .stat-mi{
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 600;
+    font-size: clamp(24px, 4.6vw, 32px);
+    line-height: 1;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+  .stat-mi small{
+    font-size: .48em;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--gold);
+    letter-spacing: .08em;
+  }
+  .stat-km{
+    margin-top: 4px;
+    font-size: 12.5px;
+    letter-spacing: .06em;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .mileage-bar{
+    height: 3px;
+    border-radius: 999px;
+    background: rgba(201,164,92,.15);
+    margin-top: clamp(18px, 3vw, 24px);
+    overflow: hidden;
+  }
+  .mileage-bar i{
+    display: block; height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, var(--gold-dim), var(--gold));
+    transition: width 1.4s ease;
+  }
+  .mileage-note{
+    margin-top: 12px;
+    text-align: center;
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--muted);
+  }
+  .mileage-note b{ color: var(--gold); font-weight: 400; }
+
   /* ── 카드 그리드 ───────────────────── */
   .gallery{
     display: grid;
@@ -510,6 +625,42 @@
 </div>
 <p class="tour-counter" id="tourCounter"></p>
 
+<!-- 누적 이동 거리 -->
+<div class="mileage-wrap">
+  <div class="mileage-card">
+    <p class="mileage-title">Tour Mileage</p>
+    <p class="mileage-sub" id="mileageSub">투어 누적 이동 거리</p>
+    <div class="mileage-grid">
+      <div class="stat">
+        <span class="stat-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M10.5 13.5 3 11l1.5-1.5 6 .75 5-5.25c.6-.6 1.8-.9 2.5-.25.65.7.35 1.9-.25 2.5l-5.25 5 .75 6L11.75 20l-2.5-7.5"/><path d="M4.5 19.5h15"/></svg>
+        </span>
+        <p class="stat-label">By Air<br>from JFK</p>
+        <div class="stat-value">
+          <p class="stat-mi"><span id="airMi">0</span> <small>mi</small></p>
+          <p class="stat-km" id="airKm">0 km</p>
+        </div>
+      </div>
+      <div class="stat">
+        <span class="stat-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M5 16l1.2-4.2c.25-.9 1-1.5 1.9-1.5h7.8c.9 0 1.65.6 1.9 1.5L19 16"/><path d="M4 16h16v3.2a.8.8 0 0 1-.8.8H18a.8.8 0 0 1-.8-.8V18H6.8v1.2a.8.8 0 0 1-.8.8H4.8a.8.8 0 0 1-.8-.8z"/><path d="M6.5 13.5h11"/></svg>
+        </span>
+        <p class="stat-label">By Road<br>from Belasco Theatre</p>
+        <div class="stat-value">
+          <p class="stat-mi"><span id="carMi">0</span> <small>mi</small></p>
+          <p class="stat-km" id="carKm">0 km</p>
+        </div>
+      </div>
+    </div>
+    <div class="mileage-bar"><i id="mileageBar"></i></div>
+    <p class="mileage-note">
+      ✈ 비행 거리는 <b>뉴욕 JFK 공항</b>에서 각 도시 최대 공항까지의 항공 마일리지 누적,
+      🚗 주행 거리는 <b>뉴욕 Belasco Theatre</b>에서 각 공연장까지 자동차로 이동한 거리의 누적입니다.<br>
+      <b>카드를 탭하면</b> 전체 투어(#1 → #32)를 도시별로 따라가는 시뮬레이션이 재생됩니다.
+    </p>
+  </div>
+</div>
+
 <!-- ══════════ 포토카드 ══════════ -->
 <div class="section-head">
   <h2 class="section-title">Photocards</h2>
@@ -670,6 +821,115 @@
   };
   window.addEventListener("load", centerOnNext);
   updateNav();
+
+  /* ══════════════ 누적 마일리지 ══════════════
+     air : JFK → 각 도시 최대 공항 항공 거리(마일, 대권거리 근사치)
+     road: Belasco Theatre(NYC) → 각 공연장 자동차 주행 거리(마일, 근사치) */
+  const LEGS = {
+    1:{air:184, road:190},   2:{air:461, road:510},   3:{air:610, road:700},
+    4:{air:213, road:225},   5:{air:427, road:500},   6:{air:509, road:615},
+    7:{air:483, road:535},   8:{air:617, road:715},   9:{air:1029,road:1200},
+    10:{air:811, road:950},  11:{air:1027,road:1120}, 12:{air:1148,road:1250},
+    13:{air:750, road:940},  14:{air:340, road:370},  15:{air:740, road:790},
+    16:{air:589, road:640},  17:{air:187, road:215},  18:{air:107, road:115},
+    19:{air:144, road:180},  20:{air:425, road:460},  21:{air:94,  road:95},
+    22:{air:662, road:740},  23:{air:892, road:950},  24:{air:1990,road:2170},
+    25:{air:2475,road:2790}, 26:{air:2446,road:2760}, 27:{air:2248,road:2520},
+    28:{air:2454,road:2760}, 29:{air:2586,road:2900}, 30:{air:2421,road:2850},
+    31:{air:2521,road:2810}, 32:{air:1626,road:1780}
+  };
+
+  /* 오늘 기준 이미 시작된 공연까지 누적 */
+  const hasStarted = p => new Date(p.start + "T00:00:00") <= today;
+  let doneCount = 0, airSum = 0, roadSum = 0, airTotal = 0, roadTotal = 0;
+  PERFORMANCES.forEach(p => {
+    const leg = LEGS[p.n]; if (!leg) return;
+    airTotal += leg.air; roadTotal += leg.road;
+    if (hasStarted(p)) { doneCount++; airSum += leg.air; roadSum += leg.road; }
+  });
+
+  const MI2KM = 1.60934;
+  const fmt = n => Math.round(n).toLocaleString("en-US");
+
+  const elAirMi = document.getElementById("airMi");
+  const elCarMi = document.getElementById("carMi");
+  const elAirKm = document.getElementById("airKm");
+  const elCarKm = document.getElementById("carKm");
+  const elBar   = document.getElementById("mileageBar");
+  const elSub   = document.getElementById("mileageSub");
+
+  const setMileage = (air, road, count, subText) => {
+    elAirMi.textContent = fmt(air);
+    elCarMi.textContent = fmt(road);
+    elAirKm.textContent = fmt(air  * MI2KM) + " km";
+    elCarKm.textContent = fmt(road * MI2KM) + " km";
+    elBar.style.width = (count / PERFORMANCES.length * 100) + "%";
+    elSub.textContent = subText;
+  };
+
+  /* 오늘 기준 자동 누적 표시 (카운트업 애니메이션) */
+  let gen = 0;                                  /* 애니메이션 세대 — 겹침 방지 */
+  const renderToday = () => {
+    const myGen = ++gen;
+    const guard = (el, target, suffix) => {
+      const dur = 1400, t0 = performance.now();
+      const tick = now => {
+        if (myGen !== gen) return;
+        const r = Math.min(1, (now - t0) / dur);
+        const eased = 1 - Math.pow(1 - r, 3);
+        el.textContent = fmt(target * eased) + (suffix || "");
+        if (r < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    };
+    guard(elAirMi, airSum);
+    guard(elCarMi, roadSum);
+    guard(elAirKm, airSum  * MI2KM, " km");
+    guard(elCarKm, roadSum * MI2KM, " km");
+    elBar.style.width = (doneCount / PERFORMANCES.length * 100) + "%";
+    elSub.textContent = "투어 누적 이동 거리 · " + doneCount + " / " + PERFORMANCES.length + " cities · tap to simulate";
+  };
+
+  /* 탭 → 전체 투어 시뮬레이션 (#1부터 도시별로 누적) / 다시 탭 → 오늘 기준 복귀 */
+  const mileageCard = document.querySelector(".mileage-card");
+  let simTimer = null;
+
+  const stopSim = () => { if (simTimer){ clearInterval(simTimer); simTimer = null; } };
+
+  const runSimulation = () => {
+    stopSim();
+    gen++;                                       /* 진행 중인 카운트업 중단 */
+    let i = 0, air = 0, road = 0;
+    setMileage(0, 0, 0, "시뮬레이션 시작 · New York, NY");
+    simTimer = setInterval(() => {
+      const p = PERFORMANCES[i];
+      const leg = LEGS[p.n] || { air: 0, road: 0 };
+      air += leg.air; road += leg.road; i++;
+      setMileage(air, road, i, "#" + p.n + " · " + p.city + "  (" + i + "/" + PERFORMANCES.length + ")");
+      if (i >= PERFORMANCES.length){
+        stopSim();
+        elSub.textContent = "전체 투어 시뮬레이션 완료 · " + PERFORMANCES.length + " cities · tap to reset";
+      }
+    }, 220);
+  };
+
+  mileageCard.setAttribute("role", "button");
+  mileageCard.setAttribute("aria-label", "탭하면 전체 투어 마일리지 시뮬레이션 재생");
+  mileageCard.addEventListener("click", () => {
+    if (simTimer){ stopSim(); renderToday(); }        /* 재생 중 탭 → 중단, 오늘 기준 */
+    else if (elSub.textContent.indexOf("시뮬레이션 완료") !== -1){ renderToday(); }
+    else { runSimulation(); }
+  });
+
+  /* 카드가 화면에 들어올 때 오늘 기준 카운트 시작 (미지원 시 즉시) */
+  if ("IntersectionObserver" in window) {
+    const mo = new IntersectionObserver(es => {
+      es.forEach(e => { if (e.isIntersecting) { mo.disconnect(); renderToday(); } });
+    }, { threshold: .3 });
+    mo.observe(mileageCard);
+  } else {
+    renderToday();
+  }
 
   /* ── 지도 플레이스홀더 ── */
   function mapPlaceholder(){
