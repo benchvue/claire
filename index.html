@@ -656,7 +656,7 @@
     <p class="mileage-note">
       ✈ 비행 거리는 <b>뉴욕 JFK 공항</b>에서 각 도시 최대 공항까지의 항공 마일리지 누적,
       🚗 주행 거리는 <b>뉴욕 Belasco Theatre</b>에서 각 공연장까지 자동차로 이동한 거리의 누적입니다.<br>
-      <b>카드를 탭하면</b> 전체 투어(#1 → #32)를 도시별로 따라가는 시뮬레이션이 재생됩니다.
+      위 <b>공연 카드를 탭하면</b> 그 도시까지의 누적 거리가 계산되고, <b>이 카드를 탭하면</b> 오늘 기준으로 돌아갑니다.
     </p>
   </div>
 </div>
@@ -778,8 +778,11 @@
         <div class="show-venue">${p.venue}</div>
       </div>`;
 
-    /* 클릭은 공연장 이름 표시/숨김만 담당 */
-    card.addEventListener("click", () => card.classList.toggle("revealed"));
+    /* 클릭: 공연장 이름 표시/숨김 + 이 도시까지의 누적 거리 계산 */
+    card.addEventListener("click", () => {
+      card.classList.toggle("revealed");
+      if (window.showMileageUpTo) window.showMileageUpTo(idx);
+    });
 
     track.appendChild(card);
     if (bgObserver) bgObserver.observe(card); else loadCityBg(card);
@@ -887,39 +890,62 @@
     guard(elAirKm, airSum  * MI2KM, " km");
     guard(elCarKm, roadSum * MI2KM, " km");
     elBar.style.width = (doneCount / PERFORMANCES.length * 100) + "%";
-    elSub.textContent = "투어 누적 이동 거리 · " + doneCount + " / " + PERFORMANCES.length + " cities · tap to simulate";
+    elSub.textContent = "오늘 기준 투어 누적 이동 거리 · " + doneCount + " / " + PERFORMANCES.length + " cities";
   };
 
-  /* 탭 → 전체 투어 시뮬레이션 (#1부터 도시별로 누적) / 다시 탭 → 오늘 기준 복귀 */
-  const mileageCard = document.querySelector(".mileage-card");
-  let simTimer = null;
-
-  const stopSim = () => { if (simTimer){ clearInterval(simTimer); simTimer = null; } };
-
-  const runSimulation = () => {
-    stopSim();
-    gen++;                                       /* 진행 중인 카운트업 중단 */
-    let i = 0, air = 0, road = 0;
-    setMileage(0, 0, 0, "시뮬레이션 시작 · New York, NY");
-    simTimer = setInterval(() => {
-      const p = PERFORMANCES[i];
+  /* ── 공연 카드를 탭하면 그 도시까지의 누적 거리 계산 ──
+     (#1부터 탭한 카드까지 합산 · 마일리지 카드를 탭하면 오늘 기준으로 복귀) */
+  const cumAir = [], cumRoad = [];
+  (function(){
+    let a = 0, r = 0;
+    PERFORMANCES.forEach((p, i) => {
       const leg = LEGS[p.n] || { air: 0, road: 0 };
-      air += leg.air; road += leg.road; i++;
-      setMileage(air, road, i, "#" + p.n + " · " + p.city + "  (" + i + "/" + PERFORMANCES.length + ")");
-      if (i >= PERFORMANCES.length){
-        stopSim();
-        elSub.textContent = "전체 투어 시뮬레이션 완료 · " + PERFORMANCES.length + " cities · tap to reset";
-      }
-    }, 220);
+      a += leg.air; r += leg.road;
+      cumAir[i] = a; cumRoad[i] = r;
+    });
+  })();
+
+  const mileageCard = document.querySelector(".mileage-card");
+
+  const animateTo = (air, road, count, subText) => {
+    const myGen = ++gen;
+    const dur = 900, t0 = performance.now();
+    const fromAir  = parseFloat(elAirMi.textContent.replace(/,/g, "")) || 0;
+    const fromRoad = parseFloat(elCarMi.textContent.replace(/,/g, "")) || 0;
+    const tick = now => {
+      if (myGen !== gen) return;
+      const r = Math.min(1, (now - t0) / dur);
+      const e = 1 - Math.pow(1 - r, 3);
+      const a = fromAir  + (air  - fromAir)  * e;
+      const d = fromRoad + (road - fromRoad) * e;
+      elAirMi.textContent = fmt(a);
+      elCarMi.textContent = fmt(d);
+      elAirKm.textContent = fmt(a * MI2KM) + " km";
+      elCarKm.textContent = fmt(d * MI2KM) + " km";
+      if (r < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+    elBar.style.width = (count / PERFORMANCES.length * 100) + "%";
+    elSub.textContent = subText;
   };
 
+  window.showMileageUpTo = (idx) => {
+    const p = PERFORMANCES[idx];
+    animateTo(cumAir[idx], cumRoad[idx], idx + 1,
+      "#" + p.n + " " + p.city + "까지 누적 · " + (idx + 1) + " / " + PERFORMANCES.length + " cities");
+    /* 마일리지 카드가 화면 밖이면 살짝 스크롤해서 보이게 */
+    const rect = mileageCard.getBoundingClientRect();
+    const vh = window.innerHeight || document.documentElement.clientHeight;
+    if (rect.top >= vh || rect.bottom <= 0){
+      try { mileageCard.scrollIntoView({ behavior: "smooth", block: "nearest" }); }
+      catch (e) { mileageCard.scrollIntoView(); }
+    }
+  };
+
+  /* 마일리지 카드를 탭하면 오늘 기준 자동 계산으로 복귀 */
   mileageCard.setAttribute("role", "button");
-  mileageCard.setAttribute("aria-label", "탭하면 전체 투어 마일리지 시뮬레이션 재생");
-  mileageCard.addEventListener("click", () => {
-    if (simTimer){ stopSim(); renderToday(); }        /* 재생 중 탭 → 중단, 오늘 기준 */
-    else if (elSub.textContent.indexOf("시뮬레이션 완료") !== -1){ renderToday(); }
-    else { runSimulation(); }
-  });
+  mileageCard.setAttribute("aria-label", "탭하면 오늘 기준 누적 거리로 되돌립니다");
+  mileageCard.addEventListener("click", renderToday);
 
   /* 카드가 화면에 들어올 때 오늘 기준 카운트 시작 (미지원 시 즉시) */
   if ("IntersectionObserver" in window) {
