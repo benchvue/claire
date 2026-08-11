@@ -245,8 +245,7 @@ let tokenClient = null;
 const $ = id => document.getElementById(id);
 const toast = msg => {
   const t = $("toast"); t.textContent = msg; t.classList.add("show");
-  const dur = /실패|오류|⚠/.test(msg) ? 8000 : 3200;
-  clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove("show"), dur);
+  clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove("show"), 3200);
 };
 
 const initAuth = () => {
@@ -255,13 +254,6 @@ const initAuth = () => {
     scope: "https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/userinfo.email",
     callback: (resp) => {
       if (resp.error){ toast("로그인 실패: " + resp.error); return; }
-      /* 동의 화면에서 Drive 체크박스를 안 누르면 권한 없는 토큰이 발급됨 → 재요청 */
-      if (google.accounts.oauth2.hasGrantedAllScopes &&
-          !google.accounts.oauth2.hasGrantedAllScopes(resp, "https://www.googleapis.com/auth/drive")){
-        toast("⚠ 동의 화면에서 'Google Drive' 체크박스를 선택해야 합니다. 다시 로그인해 주세요.");
-        setTimeout(() => tokenClient.requestAccessToken({ prompt: "consent" }), 1800);
-        return;
-      }
       accessToken = resp.access_token;
       fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
         headers: { Authorization: "Bearer " + accessToken }
@@ -310,22 +302,7 @@ const listFolder = (folderId) =>
     + "?q=" + encodeURIComponent("'" + folderId + "' in parents and trashed=false")
     + "&fields=" + encodeURIComponent("files(id,name,mimeType)")
     + "&pageSize=1000", { headers: authHeaders() })
-  .then(r => {
-    if (!r.ok){
-      return r.json().catch(() => ({})).then(d => {
-        const g = d && d.error ? d.error : {};
-        let hint = "";
-        if (r.status === 403 && /insufficient/i.test(g.message || "")) 
-          hint = " → 로그아웃 후 다시 로그인하면서 동의 화면의 Drive 체크박스를 선택하세요.";
-        else if (r.status === 403 && /not configured|disabled|has not been used/i.test(g.message || ""))
-          hint = " → 이 프로젝트에서 Google Drive API가 사용 설정되어 있는지 확인하세요 (OAuth 클라이언트와 같은 프로젝트여야 함).";
-        else if (r.status === 404)
-          hint = " → 폴더 ID를 확인하세요.";
-        throw new Error("목록 읽기 실패 " + r.status + (g.message ? " · " + g.message : "") + hint);
-      });
-    }
-    return r.json();
-  })
+  .then(r => { if (!r.ok) throw new Error("목록 읽기 실패 (" + r.status + ")"); return r.json(); })
   .then(d => d.files || []);
 
 const deleteFile = (id) =>
@@ -381,14 +358,6 @@ const toWebp = (file) => new Promise((resolve, reject) => {
 /* ══════════════════════ 데이터 로드 & 렌더 ══════════════════════ */
 let imageFiles = [], videoFiles = [];
 
-const showLoadError = (msg) => {
-  const html = '<div class="frame" style="grid-column:1/-1;padding:18px;font-size:13px;'
-    + 'line-height:1.8;color:var(--err)">⚠ ' + msg
-    + '<br><span style="color:var(--muted)">해결 후 우측 상단 [새로고침]을 누르세요.</span></div>';
-  $("cardGrid").innerHTML = html;
-  $("vidGrid").innerHTML = html;
-};
-
 const loadAll = () => {
   toast("불러오는 중…");
   Promise.all([listFolder(CONFIG.imagesFolder), listFolder(CONFIG.videosFolder)])
@@ -397,7 +366,7 @@ const loadAll = () => {
       renderCards(); renderVideos();
       toast("불러오기 완료");
     })
-    .catch(e => { showLoadError(e.message); toast(e.message); });
+    .catch(e => toast(e.message));
 };
 
 const cardMap = () => {
