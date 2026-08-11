@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Content Upload — Claire Kwon</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+  :root{
+    --bg:#131011; --bg-soft:#1c1719; --ink:#f2ece2;
+    --gold:#c9a45c; --gold-dim:#8a7040; --muted:#9b9089;
+    --card-border: rgba(201,164,92,.55);
+    --ok:#7fbf7f; --err:#e07a7a;
+    --radius:18px;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{
+    background: radial-gradient(1000px 500px at 50% -150px, rgba(201,164,92,.10), transparent 60%), var(--bg);
+    color: var(--ink);
+    font-family:'Noto Sans KR',sans-serif; font-weight:300;
+    min-height:100vh;
+  }
+  .frame{
+    border:1px solid var(--card-border); border-radius:var(--radius);
+    background:var(--bg-soft);
+    box-shadow: 0 0 0 5px rgba(19,16,17,1), 0 0 0 6px rgba(201,164,92,.28), 0 24px 50px -18px rgba(0,0,0,.75);
+  }
+  button{ font-family:inherit; }
+
+  /* ── 잠금 화면 ── */
+  .lock{
+    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;
+  }
+  .lock-card{ text-align:center; padding:52px 40px; max-width:420px; width:100%; }
+  .lock-icon{ font-size:34px; }
+  .lock-title{
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    font-size:30px; letter-spacing:.16em; margin-top:14px;
+  }
+  .lock-sub{ margin-top:10px; font-size:13px; color:var(--muted); letter-spacing:.06em; line-height:1.7; }
+  .gbtn{
+    margin-top:26px; display:inline-flex; align-items:center; gap:10px;
+    border:1px solid var(--gold-dim); border-radius:999px;
+    background:rgba(201,164,92,.1); color:var(--ink);
+    padding:12px 26px; font-size:14px; letter-spacing:.06em; cursor:pointer;
+    transition:background .25s ease;
+  }
+  .gbtn:hover{ background:rgba(201,164,92,.25); }
+  .denied{ color:var(--err); margin-top:18px; font-size:13px; display:none; }
+
+  /* ── 관리 패널 ── */
+  .panel{ display:none; max-width:1180px; margin:0 auto; padding:30px clamp(14px,3vw,40px) 80px; }
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+    padding:18px 22px; margin-bottom:26px;
+  }
+  .topbar h1{
+    font-family:'Cormorant Garamond',serif; font-weight:400; font-style:italic;
+    font-size:clamp(20px,4vw,26px); letter-spacing:.12em;
+  }
+  .who{ font-size:12px; color:var(--muted); letter-spacing:.04em; }
+  .who b{ color:var(--gold); font-weight:400; }
+  .topbar .actions{ display:flex; gap:8px; }
+  .mini{
+    border:1px solid var(--gold-dim); border-radius:999px; background:none;
+    color:var(--ink); font-size:12px; padding:7px 14px; cursor:pointer; letter-spacing:.06em;
+    transition:background .2s ease; text-decoration:none; display:inline-block;
+  }
+  .mini:hover{ background:rgba(201,164,92,.18); }
+
+  .sec-title{
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    font-size:clamp(20px,3.4vw,26px); letter-spacing:.12em;
+    margin:34px 4px 4px;
+  }
+  .sec-sub{ font-size:12px; color:var(--muted); margin:0 4px 16px; line-height:1.7; }
+  .sec-sub b{ color:var(--gold); font-weight:400; }
+
+  /* 카드 편집기 그리드 */
+  .edit-grid{
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+    gap:clamp(14px,2.4vw,24px);
+  }
+  .edit-card{ padding:16px; }
+  .edit-head{
+    display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;
+  }
+  .edit-no{
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    font-size:18px; letter-spacing:.14em; color:var(--gold);
+  }
+  .del-card{
+    border:none; background:none; color:var(--muted); font-size:11.5px;
+    cursor:pointer; letter-spacing:.08em; text-decoration:underline;
+  }
+  .del-card:hover{ color:var(--err); }
+  .sides{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .slot{ text-align:center; }
+  .slot-label{
+    font-size:10.5px; letter-spacing:.24em; text-transform:uppercase;
+    color:var(--gold-dim); margin-bottom:8px;
+  }
+  .slot-img{
+    position:relative; width:100%; aspect-ratio:2/3;
+    border:1px solid rgba(201,164,92,.3); border-radius:12px;
+    overflow:hidden; background:#171314;
+  }
+  @supports not (aspect-ratio:2/3){ .slot-img{ height:0; padding-bottom:150%; } }
+  .slot-img img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .slot-img.empty::after{
+    content:"없음"; position:absolute; inset:0; display:grid; place-items:center;
+    color:var(--muted); font-size:12px; letter-spacing:.2em;
+  }
+  .slot-btns{ display:flex; gap:6px; justify-content:center; margin-top:8px; flex-wrap:wrap; }
+  .up-btn{
+    border:1px solid var(--gold-dim); border-radius:999px; background:rgba(201,164,92,.1);
+    color:var(--ink); font-size:11.5px; padding:6px 13px; cursor:pointer; letter-spacing:.04em;
+  }
+  .up-btn:hover{ background:rgba(201,164,92,.25); }
+  .up-btn.danger{ background:none; border-color:rgba(224,122,122,.4); color:var(--muted); }
+  .up-btn.danger:hover{ background:rgba(224,122,122,.15); color:var(--err); }
+  .slot-status{ margin-top:7px; font-size:11px; min-height:15px; color:var(--muted); }
+  .slot-status.ok{ color:var(--ok); }
+  .slot-status.err{ color:var(--err); }
+  .prog{ height:3px; border-radius:999px; background:rgba(201,164,92,.15); margin-top:6px; overflow:hidden; }
+  .prog i{ display:block; height:100%; width:0; background:var(--gold); transition:width .2s; }
+
+  /* 새 항목 추가 */
+  .add-card{
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:12px; padding:24px 16px; border-style:dashed !important; min-height:220px;
+    border:1px dashed rgba(201,164,92,.4); border-radius:var(--radius); background:rgba(28,23,25,.5);
+    box-shadow:none;
+  }
+  .add-title{ font-size:13px; letter-spacing:.14em; color:var(--gold); }
+  .add-row{ display:flex; align-items:center; gap:8px; font-size:13px; color:var(--muted); }
+  .add-row input{
+    width:64px; background:#171314; border:1px solid var(--gold-dim); border-radius:8px;
+    color:var(--ink); padding:7px 9px; font-size:14px; text-align:center; font-family:inherit;
+  }
+
+  /* 비디오 편집기 */
+  .vid-grid{
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+    gap:clamp(14px,2.4vw,24px);
+  }
+  .vid-card{ padding:14px; }
+  .vid-thumb{
+    position:relative; width:100%; aspect-ratio:16/9;
+    border:1px solid rgba(201,164,92,.3); border-radius:12px;
+    overflow:hidden; background:#171314;
+  }
+  @supports not (aspect-ratio:16/9){ .vid-thumb{ height:0; padding-bottom:56.25%; } }
+  .vid-thumb img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .vid-thumb .tag{
+    position:absolute; left:10px; bottom:8px;
+    font-family:'Cormorant Garamond',serif; font-style:italic; font-size:14px;
+    color:var(--ink); text-shadow:0 1px 8px rgba(0,0,0,.9); letter-spacing:.12em;
+  }
+
+  .toast{
+    position:fixed; left:50%; bottom:26px; transform:translateX(-50%);
+    background:rgba(19,16,17,.95); border:1px solid var(--gold-dim);
+    border-radius:999px; padding:11px 22px; font-size:13px; letter-spacing:.04em;
+    opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:50;
+    max-width:92vw; text-align:center;
+  }
+  .toast.show{ opacity:1; }
+</style>
+</head>
+<body>
+
+<!-- ══════════ 잠금 화면 (기본) ══════════ -->
+<div class="lock" id="lockScreen">
+  <div class="lock-card frame">
+    <div class="lock-icon">🔒</div>
+    <p class="lock-title">ADMIN&nbsp;ONLY</p>
+    <p class="lock-sub">이 페이지는 관리자 전용입니다.<br>Kwon family 계정으로 로그인하세요.</p>
+    <button class="gbtn" id="signInBtn">
+      <svg width="17" height="17" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.5l6.7-6.7C35.6 2.4 30.2 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.8 6.1C12.3 13.4 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z"/><path fill="#FBBC05" d="M10.4 28.7A14.6 14.6 0 0 1 9.5 24c0-1.6.3-3.2.8-4.7l-7.8-6.1A24 24 0 0 0 0 24c0 3.9.9 7.5 2.6 10.8l7.8-6.1z"/><path fill="#34A853" d="M24 48c6.2 0 11.5-2 15.3-5.6l-7.5-5.8c-2.1 1.4-4.8 2.3-7.8 2.3-6.3 0-11.7-3.9-13.6-9.4l-7.8 6.1C6.5 42.6 14.6 48 24 48z"/></svg>
+      Google 계정으로 로그인
+    </button>
+    <p class="denied" id="deniedMsg">이 계정은 관리자 권한이 없습니다.</p>
+  </div>
+</div>
+
+<!-- ══════════ 관리 패널 (admin 전용) ══════════ -->
+<div class="panel" id="panel">
+  <div class="topbar frame">
+    <div>
+      <h1>Claire Kwon · Content Upload</h1>
+      <p class="who" id="whoAmI"></p>
+    </div>
+    <div class="actions">
+      <a class="mini" href="index.html" target="_blank">사이트 보기 ↗</a>
+      <button class="mini" id="refreshBtn">새로고침</button>
+      <button class="mini" id="signOutBtn">로그아웃</button>
+    </div>
+  </div>
+
+  <h2 class="sec-title">Photocards</h2>
+  <p class="sec-sub">
+    이미지는 아무 형식(jpg·png·webp 등)이나 올려도 <b>자동으로 WebP로 변환</b>되어 Drive에 저장됩니다.
+    이미 있는 면에 올리면 <b>교체(replace)</b>됩니다. · 권장 비율 2:3 세로형
+  </p>
+  <div class="edit-grid" id="cardGrid"></div>
+
+  <h2 class="sec-title">On Stage — Videos</h2>
+  <p class="sec-sub">mp4 권장 (mov·webm 가능) · 썸네일은 업로드 후 Drive가 자동 생성합니다 (몇 분 걸릴 수 있음)</p>
+  <div class="vid-grid" id="vidGrid"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══════════════════════ 설정 ══════════════════════ */
+const CONFIG = {
+  /* Google Cloud Console → APIs & Services → Credentials →
+     Create credentials → OAuth client ID → Web application
+     Authorized JavaScript origins 에 https://benchvue.github.io 추가 후
+     생성된 Client ID 를 여기에 붙여넣기 */
+  clientId: "1075824030904-2vaopgb8651nmq66eetf9ekf4965pkm2.apps.googleusercontent.com",
+
+  /* 관리자 Gmail 목록 — 나중에 가족 계정을 여기에 추가 */
+  adminEmails: [
+    "benchvue101@gmail.com"
+    /* , "family1@gmail.com", "family2@gmail.com" */
+  ],
+
+  imagesFolder: "1BgZ9Ex1MOjWq_athrUEKhhzkn7l6iEVx",
+  videosFolder: "1iUaMbCY9u7BCetq1FPEDjtJ7QK-gE_El",
+
+  webpQuality: 0.82,      /* WebP 변환 품질 */
+  webpMaxDim: 1600        /* 긴 변 최대 픽셀 (자동 리사이즈) */
+};
+
+/* ══════════════════════ 인증 ══════════════════════ */
+let accessToken = null, myEmail = "";
+let tokenClient = null;
+
+const $ = id => document.getElementById(id);
+const toast = msg => {
+  const t = $("toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove("show"), 3200);
+};
+
+const initAuth = () => {
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: CONFIG.clientId,
+    scope: "https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/userinfo.email",
+    callback: (resp) => {
+      if (resp.error){ toast("로그인 실패: " + resp.error); return; }
+      accessToken = resp.access_token;
+      fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+        headers: { Authorization: "Bearer " + accessToken }
+      })
+      .then(r => r.json())
+      .then(info => {
+        myEmail = (info.email || "").toLowerCase();
+        const ok = CONFIG.adminEmails.some(e => e.toLowerCase() === myEmail);
+        if (!ok){
+          accessToken = null;
+          $("deniedMsg").style.display = "block";
+          return;
+        }
+        $("lockScreen").style.display = "none";
+        $("panel").style.display = "block";
+        $("whoAmI").innerHTML = "로그인: <b>" + myEmail + "</b>";
+        loadAll();
+      })
+      .catch(() => toast("계정 정보를 가져오지 못했습니다"));
+    }
+  });
+};
+
+$("signInBtn").addEventListener("click", () => {
+  if (!tokenClient){
+    if (window.google && google.accounts) initAuth();
+    else { toast("Google 로그인 로딩 중… 잠시 후 다시 눌러주세요"); return; }
+  }
+  $("deniedMsg").style.display = "none";
+  tokenClient.requestAccessToken();
+});
+
+$("signOutBtn").addEventListener("click", () => {
+  if (accessToken) google.accounts.oauth2.revoke(accessToken, function(){});
+  location.reload();
+});
+$("refreshBtn").addEventListener("click", () => loadAll());
+
+window.addEventListener("load", () => { if (window.google && google.accounts) initAuth(); });
+
+/* ══════════════════════ Drive API 헬퍼 ══════════════════════ */
+const authHeaders = () => ({ Authorization: "Bearer " + accessToken });
+
+const listFolder = (folderId) =>
+  fetch("https://www.googleapis.com/drive/v3/files"
+    + "?q=" + encodeURIComponent("'" + folderId + "' in parents and trashed=false")
+    + "&fields=" + encodeURIComponent("files(id,name,mimeType)")
+    + "&pageSize=1000", { headers: authHeaders() })
+  .then(r => { if (!r.ok) throw new Error("목록 읽기 실패 (" + r.status + ")"); return r.json(); })
+  .then(d => d.files || []);
+
+const deleteFile = (id) =>
+  fetch("https://www.googleapis.com/drive/v3/files/" + id, {
+    method: "DELETE", headers: authHeaders()
+  }).then(r => { if (!r.ok && r.status !== 404) throw new Error("삭제 실패 (" + r.status + ")"); });
+
+/* multipart 업로드 (진행률 표시를 위해 XHR 사용) */
+const uploadFile = (name, mime, blob, folderId, onProgress) => new Promise((resolve, reject) => {
+  const meta = { name: name, parents: [folderId] };
+  const boundary = "claire" + Date.now();
+  const head =
+    "--" + boundary + "\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n" +
+    JSON.stringify(meta) + "\r\n" +
+    "--" + boundary + "\r\nContent-Type: " + mime + "\r\n\r\n";
+  const tail = "\r\n--" + boundary + "--";
+  const body = new Blob([head, blob, tail]);
+
+  const xhr = new XMLHttpRequest();
+  xhr.open("POST", "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name");
+  xhr.setRequestHeader("Authorization", "Bearer " + accessToken);
+  xhr.setRequestHeader("Content-Type", "multipart/related; boundary=" + boundary);
+  xhr.upload.onprogress = e => { if (e.lengthComputable && onProgress) onProgress(e.loaded / e.total); };
+  xhr.onload = () => {
+    if (xhr.status >= 200 && xhr.status < 300) resolve(JSON.parse(xhr.responseText));
+    else reject(new Error("업로드 실패 (" + xhr.status + ")"));
+  };
+  xhr.onerror = () => reject(new Error("네트워크 오류"));
+  xhr.send(body);
+});
+
+const thumbUrl = (id, w) =>
+  "https://drive.google.com/thumbnail?id=" + id + "&sz=w" + (w || 400) + "&t=" + Date.now();
+
+/* ══════════════════════ WebP 변환 ══════════════════════ */
+const toWebp = (file) => new Promise((resolve, reject) => {
+  const url = URL.createObjectURL(file);
+  const img = new Image();
+  img.onload = () => {
+    let w = img.naturalWidth, h = img.naturalHeight;
+    const sc = Math.min(1, CONFIG.webpMaxDim / Math.max(w, h));
+    w = Math.round(w * sc); h = Math.round(h * sc);
+    const c = document.createElement("canvas");
+    c.width = w; c.height = h;
+    c.getContext("2d").drawImage(img, 0, 0, w, h);
+    URL.revokeObjectURL(url);
+    c.toBlob(b => b ? resolve(b) : reject(new Error("WebP 변환 실패")), "image/webp", CONFIG.webpQuality);
+  };
+  img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("이미지를 읽을 수 없습니다 (HEIC는 jpg/png로 변환 후 업로드)")); };
+  img.src = url;
+});
+
+/* ══════════════════════ 데이터 로드 & 렌더 ══════════════════════ */
+let imageFiles = [], videoFiles = [];
+
+const loadAll = () => {
+  toast("불러오는 중…");
+  Promise.all([listFolder(CONFIG.imagesFolder), listFolder(CONFIG.videosFolder)])
+    .then(res => {
+      imageFiles = res[0]; videoFiles = res[1];
+      renderCards(); renderVideos();
+      toast("불러오기 완료");
+    })
+    .catch(e => toast(e.message));
+};
+
+const cardMap = () => {
+  const map = {};
+  imageFiles.forEach(f => {
+    const m = f.name.match(/^(front|back)_(\d+)\.(webp|jpe?g|png|gif)$/i);
+    if (!m) return;
+    const n = parseInt(m[2], 10);
+    (map[n] = map[n] || {})[m[1].toLowerCase()] = f;
+  });
+  return map;
+};
+
+/* ── 포토카드 렌더 ── */
+const renderCards = () => {
+  const grid = $("cardGrid");
+  grid.innerHTML = "";
+  const map = cardMap();
+  const nums = Object.keys(map).map(Number).sort((a, b) => a - b);
+
+  nums.forEach(n => grid.appendChild(buildCardEditor(n, map[n])));
+
+  /* 새 카드 추가 */
+  const nextNo = nums.length ? Math.max.apply(null, nums) + 1 : 1;
+  const add = document.createElement("div");
+  add.className = "add-card";
+  add.innerHTML =
+    '<p class="add-title">＋ 새 카드 추가</p>' +
+    '<div class="add-row">카드 번호 <input type="number" min="1" value="' + nextNo + '" id="newCardNo"></div>' +
+    '<div class="slot-btns">' +
+      '<button class="up-btn" id="newFrontBtn">앞면 업로드</button>' +
+      '<button class="up-btn" id="newBackBtn">뒷면 업로드</button>' +
+    '</div>' +
+    '<p class="slot-status" id="newCardStatus"></p>';
+  grid.appendChild(add);
+  $("newFrontBtn").addEventListener("click", () =>
+    pickAndUploadImage(parseInt($("newCardNo").value, 10) || nextNo, "front", $("newCardStatus"), null));
+  $("newBackBtn").addEventListener("click", () =>
+    pickAndUploadImage(parseInt($("newCardNo").value, 10) || nextNo, "back", $("newCardStatus"), null));
+};
+
+const buildCardEditor = (n, entry) => {
+  const el = document.createElement("div");
+  el.className = "edit-card frame";
+  el.innerHTML =
+    '<div class="edit-head">' +
+      '<span class="edit-no">Card No. ' + String(n).padStart(2, "0") + '</span>' +
+      '<button class="del-card">카드 전체 삭제</button>' +
+    '</div>' +
+    '<div class="sides">' +
+      slotHtml("front", entry.front) +
+      slotHtml("back",  entry.back) +
+    '</div>';
+
+  ["front", "back"].forEach(side => {
+    const slot = el.querySelector('[data-side="' + side + '"]');
+    const status = slot.querySelector(".slot-status");
+    slot.querySelector(".js-up").addEventListener("click", () =>
+      pickAndUploadImage(n, side, status, slot));
+    const delBtn = slot.querySelector(".js-del");
+    if (delBtn) delBtn.addEventListener("click", () => {
+      if (!confirm(side + "_" + n + " 을(를) 삭제할까요?")) return;
+      status.textContent = "삭제 중…";
+      deleteFile(entry[side].id)
+        .then(() => { toast(side + "_" + n + " 삭제됨"); loadAll(); })
+        .catch(e => { status.textContent = e.message; status.className = "slot-status err"; });
+    });
+  });
+
+  el.querySelector(".del-card").addEventListener("click", () => {
+    if (!confirm("카드 " + n + "의 앞·뒷면을 모두 삭제할까요?")) return;
+    const jobs = [];
+    if (entry.front) jobs.push(deleteFile(entry.front.id));
+    if (entry.back)  jobs.push(deleteFile(entry.back.id));
+    Promise.all(jobs).then(() => { toast("카드 " + n + " 삭제됨"); loadAll(); })
+      .catch(e => toast(e.message));
+  });
+  return el;
+};
+
+const slotHtml = (side, file) => {
+  const label = side === "front" ? "Front · 앞면" : "Back · 뒷면";
+  const img = file
+    ? '<img src="' + thumbUrl(file.id, 400) + '" alt="">'
+    : "";
+  return (
+    '<div class="slot" data-side="' + side + '">' +
+      '<p class="slot-label">' + label + '</p>' +
+      '<div class="slot-img ' + (file ? "" : "empty") + '">' + img + '</div>' +
+      '<div class="slot-btns">' +
+        '<button class="up-btn js-up">' + (file ? "교체" : "업로드") + '</button>' +
+        (file ? '<button class="up-btn danger js-del">삭제</button>' : "") +
+      '</div>' +
+      '<div class="prog"><i></i></div>' +
+      '<p class="slot-status"></p>' +
+    '</div>');
+};
+
+/* 파일 선택 → WebP 변환 → 같은 이름 기존 파일 삭제 → 업로드 */
+const pickAndUploadImage = (n, side, statusEl, slotEl) => {
+  if (!n || n < 1){ toast("올바른 카드 번호를 입력하세요"); return; }
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "image/*";
+  input.onchange = () => {
+    const file = input.files[0];
+    if (!file) return;
+    const name = side + "_" + n + ".webp";
+    const bar = slotEl ? slotEl.querySelector(".prog i") : null;
+    const setS = (msg, cls) => { statusEl.textContent = msg; statusEl.className = "slot-status " + (cls || ""); };
+
+    setS("WebP 변환 중…");
+    toWebp(file)
+      .then(blob => {
+        setS("업로드 중… (" + Math.round(blob.size / 1024) + " KB)");
+        /* 같은 번호·면의 기존 파일(확장자 무관) 먼저 삭제 = 교체 */
+        const olds = imageFiles.filter(f =>
+          new RegExp("^" + side + "_" + n + "\\.(webp|jpe?g|png|gif)$", "i").test(f.name));
+        return Promise.all(olds.map(f => deleteFile(f.id)))
+          .then(() => uploadFile(name, "image/webp", blob, CONFIG.imagesFolder,
+            p => { if (bar) bar.style.width = Math.round(p * 100) + "%"; }));
+      })
+      .then(() => {
+        setS("완료!", "ok");
+        toast(name + " 업로드 완료");
+        setTimeout(loadAll, 600);
+      })
+      .catch(e => setS(e.message, "err"));
+  };
+  input.click();
+};
+
+/* ── 비디오 렌더 ── */
+const renderVideos = () => {
+  const grid = $("vidGrid");
+  grid.innerHTML = "";
+  const vids = [];
+  videoFiles.forEach(f => {
+    const m = f.name.match(/^video_(\d+)\.(mp4|mov|m4v|webm)$/i);
+    if (m) vids.push({ n: parseInt(m[1], 10), file: f });
+  });
+  vids.sort((a, b) => a.n - b.n);
+
+  vids.forEach(v => {
+    const el = document.createElement("div");
+    el.className = "vid-card frame";
+    el.innerHTML =
+      '<div class="vid-thumb">' +
+        '<img src="' + thumbUrl(v.file.id, 480) + '" alt="" onerror="this.style.display=\'none\'">' +
+        '<span class="tag">Clip ' + String(v.n).padStart(2, "0") + ' · ' + v.file.name + '</span>' +
+      '</div>' +
+      '<div class="slot-btns" style="margin-top:10px">' +
+        '<button class="up-btn js-rep">교체</button>' +
+        '<button class="up-btn danger js-del">삭제</button>' +
+      '</div>' +
+      '<div class="prog"><i></i></div>' +
+      '<p class="slot-status"></p>';
+    const status = el.querySelector(".slot-status");
+    const bar = el.querySelector(".prog i");
+    el.querySelector(".js-rep").addEventListener("click", () => pickAndUploadVideo(v.n, status, bar));
+    el.querySelector(".js-del").addEventListener("click", () => {
+      if (!confirm(v.file.name + " 을(를) 삭제할까요?")) return;
+      status.textContent = "삭제 중…";
+      deleteFile(v.file.id).then(() => { toast("삭제됨"); loadAll(); })
+        .catch(e => { status.textContent = e.message; status.className = "slot-status err"; });
+    });
+    grid.appendChild(el);
+  });
+
+  const nextNo = vids.length ? Math.max.apply(null, vids.map(v => v.n)) + 1 : 1;
+  const add = document.createElement("div");
+  add.className = "add-card";
+  add.innerHTML =
+    '<p class="add-title">＋ 새 영상 추가</p>' +
+    '<div class="add-row">영상 번호 <input type="number" min="1" value="' + nextNo + '" id="newVidNo"></div>' +
+    '<div class="slot-btns"><button class="up-btn" id="newVidBtn">영상 업로드</button></div>' +
+    '<div class="prog" style="width:70%"><i id="newVidBar"></i></div>' +
+    '<p class="slot-status" id="newVidStatus"></p>';
+  grid.appendChild(add);
+  $("newVidBtn").addEventListener("click", () =>
+    pickAndUploadVideo(parseInt($("newVidNo").value, 10) || nextNo, $("newVidStatus"), $("newVidBar")));
+};
+
+const pickAndUploadVideo = (n, statusEl, bar) => {
+  if (!n || n < 1){ toast("올바른 영상 번호를 입력하세요"); return; }
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "video/mp4,video/quicktime,video/webm,video/x-m4v";
+  input.onchange = () => {
+    const file = input.files[0];
+    if (!file) return;
+    const extM = file.name.match(/\.(mp4|mov|m4v|webm)$/i);
+    const ext = extM ? extM[1].toLowerCase() : "mp4";
+    const name = "video_" + n + "." + ext;
+    const setS = (msg, cls) => { statusEl.textContent = msg; statusEl.className = "slot-status " + (cls || ""); };
+
+    setS("업로드 중… (" + (file.size / 1048576).toFixed(1) + " MB)");
+    const olds = videoFiles.filter(f =>
+      new RegExp("^video_" + n + "\\.(mp4|mov|m4v|webm)$", "i").test(f.name));
+    Promise.all(olds.map(f => deleteFile(f.id)))
+      .then(() => uploadFile(name, file.type || "video/mp4", file, CONFIG.videosFolder,
+        p => { if (bar) bar.style.width = Math.round(p * 100) + "%"; }))
+      .then(() => {
+        setS("완료! 썸네일은 Drive가 곧 생성합니다", "ok");
+        toast(name + " 업로드 완료");
+        setTimeout(loadAll, 800);
+      })
+      .catch(e => setS(e.message, "err"));
+  };
+  input.click();
+};
+</script>
+
+</body>
+</html>
