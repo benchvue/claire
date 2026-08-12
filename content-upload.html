@@ -360,8 +360,21 @@ const uploadFile = (name, mime, blob, folderId, onProgress) => new Promise((reso
   xhr.send(body);
 });
 
-const thumbUrl = (id, w) =>
-  "https://drive.google.com/thumbnail?id=" + id + "&sz=w" + (w || 400) + "&t=" + Date.now();
+/* lh3 direct URL first (Kakao/iOS webviews block the thumbnail redirect), then fallback */
+const DRIVE_HOSTS = [
+  (id, w) => "https://lh3.googleusercontent.com/d/" + id + "=w" + w,
+  (id, w) => "https://drive.google.com/thumbnail?id=" + id + "&sz=w" + w
+];
+const setDriveImg = (img, id, w) => {
+  let k = 0;
+  img.onerror = () => {
+    k++;
+    if (k < DRIVE_HOSTS.length){ img.src = DRIVE_HOSTS[k](id, w); }
+    else { img.onerror = null; img.style.display = "none"; }
+  };
+  img.style.display = "";
+  img.src = DRIVE_HOSTS[0](id, w);
+};
 
 /* ══════════════════════ WebP 변환 ══════════════════════ */
 const toWebp = (file) => new Promise((resolve, reject) => {
@@ -458,6 +471,7 @@ const buildCardEditor = (n, entry) => {
   ["front", "back"].forEach(side => {
     const slot = el.querySelector('[data-side="' + side + '"]');
     const status = slot.querySelector(".slot-status");
+    if (entry[side]) setDriveImg(slot.querySelector(".slot-img img"), entry[side].id, 400);
     slot.querySelector(".js-up").addEventListener("click", () =>
       pickAndUploadImage(n, side, status, slot));
     const delBtn = slot.querySelector(".js-del");
@@ -483,9 +497,7 @@ const buildCardEditor = (n, entry) => {
 
 const slotHtml = (side, file) => {
   const label = side === "front" ? "Front · 앞면" : "Back · 뒷면";
-  const img = file
-    ? '<img src="' + thumbUrl(file.id, 400) + '" alt="">'
-    : "";
+  const img = file ? '<img alt="">' : "";
   return (
     '<div class="slot" data-side="' + side + '">' +
       '<p class="slot-label">' + label + '</p>' +
@@ -549,7 +561,7 @@ const renderVideos = () => {
     el.className = "vid-card frame";
     el.innerHTML =
       '<div class="vid-thumb">' +
-        '<img src="' + thumbUrl(v.file.id, 480) + '" alt="" onerror="this.style.display=\'none\'">' +
+        '<img alt="">' +
         '<span class="tag">Clip ' + String(v.n).padStart(2, "0") + ' · ' + v.file.name + '</span>' +
       '</div>' +
       '<div class="slot-btns" style="margin-top:10px">' +
@@ -560,6 +572,7 @@ const renderVideos = () => {
       '<p class="slot-status"></p>';
     const status = el.querySelector(".slot-status");
     const bar = el.querySelector(".prog i");
+    setDriveImg(el.querySelector(".vid-thumb img"), v.file.id, 480);
     el.querySelector(".js-rep").addEventListener("click", () => pickAndUploadVideo(v.n, status, bar));
     el.querySelector(".js-del").addEventListener("click", () => {
       if (!confirm(v.file.name + " 을(를) 삭제할까요?")) return;
