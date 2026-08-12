@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>Content Upload — Claire Kwon</title>
+<title>Content Upload (EN) — Claire Kwon</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
@@ -31,7 +31,7 @@
   }
   button{ font-family:inherit; }
 
-  /* ── 잠금 화면 ── */
+  /* ── Lock screen ── */
   .lock{
     min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;
   }
@@ -52,7 +52,7 @@
   .gbtn:hover{ background:rgba(201,164,92,.25); }
   .denied{ color:var(--err); margin-top:18px; font-size:13px; display:none; }
 
-  /* ── 관리 패널 ── */
+  /* ── Admin panel ── */
   .panel{ display:none; max-width:1180px; margin:0 auto; padding:30px clamp(14px,3vw,40px) 80px; }
   .topbar{
     display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
@@ -80,7 +80,7 @@
   .sec-sub{ font-size:12px; color:var(--muted); margin:0 4px 16px; line-height:1.7; }
   .sec-sub b{ color:var(--gold); font-weight:400; }
 
-  /* 카드 편집기 그리드 */
+  /* Card editor grid */
   .edit-grid{
     display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
     gap:clamp(14px,2.4vw,24px);
@@ -112,7 +112,7 @@
   @supports not (aspect-ratio:2/3){ .slot-img{ height:0; padding-bottom:150%; } }
   .slot-img img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
   .slot-img.empty::after{
-    content:"없음"; position:absolute; inset:0; display:grid; place-items:center;
+    content:"Empty"; position:absolute; inset:0; display:grid; place-items:center;
     color:var(--muted); font-size:12px; letter-spacing:.2em;
   }
   .slot-btns{ display:flex; gap:6px; justify-content:center; margin-top:8px; flex-wrap:wrap; }
@@ -129,7 +129,7 @@
   .prog{ height:3px; border-radius:999px; background:rgba(201,164,92,.15); margin-top:6px; overflow:hidden; }
   .prog i{ display:block; height:100%; width:0; background:var(--gold); transition:width .2s; }
 
-  /* 새 항목 추가 */
+  /* Add-new tiles */
   .add-card{
     display:flex; flex-direction:column; align-items:center; justify-content:center;
     gap:12px; padding:24px 16px; border-style:dashed !important; min-height:220px;
@@ -143,7 +143,7 @@
     color:var(--ink); padding:7px 9px; font-size:14px; text-align:center; font-family:inherit;
   }
 
-  /* 비디오 편집기 */
+  /* Video editor */
   .vid-grid{
     display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
     gap:clamp(14px,2.4vw,24px);
@@ -174,21 +174,21 @@
 </head>
 <body>
 
-<!-- ══════════ 잠금 화면 (기본) ══════════ -->
+<!-- ══════════ Lock screen (default) ══════════ -->
 <div class="lock" id="lockScreen">
   <div class="lock-card frame">
     <div class="lock-icon">🔒</div>
     <p class="lock-title">ADMIN&nbsp;ONLY</p>
-    <p class="lock-sub">이 페이지는 관리자 전용입니다.<br>Kwon family 계정으로 로그인하세요.</p>
+    <p class="lock-sub">This page is for administrators only.<br>Please sign in with a Kwon family account.<br><a href="content-upload.html" style="color:var(--gold);font-size:12px">한국어 페이지 →</a></p>
     <button class="gbtn" id="signInBtn">
       <svg width="17" height="17" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.5l6.7-6.7C35.6 2.4 30.2 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.8 6.1C12.3 13.4 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z"/><path fill="#FBBC05" d="M10.4 28.7A14.6 14.6 0 0 1 9.5 24c0-1.6.3-3.2.8-4.7l-7.8-6.1A24 24 0 0 0 0 24c0 3.9.9 7.5 2.6 10.8l7.8-6.1z"/><path fill="#34A853" d="M24 48c6.2 0 11.5-2 15.3-5.6l-7.5-5.8c-2.1 1.4-4.8 2.3-7.8 2.3-6.3 0-11.7-3.9-13.6-9.4l-7.8 6.1C6.5 42.6 14.6 48 24 48z"/></svg>
-      Google 계정으로 로그인
+      Sign in with Google
     </button>
-    <p class="denied" id="deniedMsg">이 계정은 관리자 권한이 없습니다.</p>
+    <p class="denied" id="deniedMsg">This account has no admin access.</p>
   </div>
 </div>
 
-<!-- ══════════ 관리 패널 (admin 전용) ══════════ -->
+<!-- ══════════ Admin panel ══════════ -->
 <div class="panel" id="panel">
   <div class="topbar frame">
     <div>
@@ -196,56 +196,60 @@
       <p class="who" id="whoAmI"></p>
     </div>
     <div class="actions">
-      <a class="mini" href="index.html" target="_blank">사이트 보기 ↗</a>
-      <button class="mini" id="refreshBtn">새로고침</button>
-      <button class="mini" id="signOutBtn">로그아웃</button>
+      <a class="mini" href="index.html" target="_blank">View site ↗</a>
+      <a class="mini" href="content-upload.html">한국어</a>
+      <button class="mini" id="refreshBtn">Refresh</button>
+      <button class="mini" id="signOutBtn">Sign out</button>
     </div>
   </div>
 
   <h2 class="sec-title">Photocards</h2>
   <p class="sec-sub">
-    이미지는 아무 형식(jpg·png·webp 등)이나 올려도 <b>자동으로 WebP로 변환</b>되어 Drive에 저장됩니다.
-    이미 있는 면에 올리면 <b>교체(replace)</b>됩니다. · 권장 비율 2:3 세로형
+    Upload images in any format (jpg · png · webp …) — they are <b>automatically converted to WebP</b> and saved to Drive.
+    Uploading onto an existing side <b>replaces</b> it. · Portrait 2:3 recommended
   </p>
   <div class="edit-grid" id="cardGrid"></div>
 
   <h2 class="sec-title">On Stage — Videos</h2>
-  <p class="sec-sub">mp4 권장 (mov·webm 가능) · 썸네일은 업로드 후 Drive가 자동 생성합니다 (몇 분 걸릴 수 있음)</p>
+  <p class="sec-sub">mp4 recommended (mov · webm accepted) · Thumbnails are generated automatically by Drive after upload (may take a few minutes)</p>
   <div class="vid-grid" id="vidGrid"></div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-/* ══════════════════════ 설정 ══════════════════════ */
+/* ══════════════════════ CONFIG ══════════════════════ */
 const CONFIG = {
   /* Google Cloud Console → APIs & Services → Credentials →
      Create credentials → OAuth client ID → Web application
-     Authorized JavaScript origins 에 https://benchvue.github.io 추가 후
-     생성된 Client ID 를 여기에 붙여넣기 */
+     Add https://benchvue.github.io to Authorized JavaScript origins,
+     then paste the generated Client ID here */
   clientId: "1075824030904-2vaopgb8651nmq66eetf9ekf4965pkm2.apps.googleusercontent.com",
 
-  /* 관리자 Gmail 목록 — 나중에 가족 계정을 여기에 추가 */
+  /* Admin Gmail allowlist — add family accounts here later */
   adminEmails: [
-    "benchvue101@gmail.com"
+    "benchvue101@gmail.com",
+    "hyongsokkwon@gmail.com",
+    "claire.kwon7@gmail.com"
     /* , "family1@gmail.com", "family2@gmail.com" */
   ],
 
   imagesFolder: "1BgZ9Ex1MOjWq_athrUEKhhzkn7l6iEVx",
   videosFolder: "1iUaMbCY9u7BCetq1FPEDjtJ7QK-gE_El",
 
-  webpQuality: 0.82,      /* WebP 변환 품질 */
-  webpMaxDim: 1600        /* 긴 변 최대 픽셀 (자동 리사이즈) */
+  webpQuality: 0.82,      /* WebP quality */
+  webpMaxDim: 1600        /* Max long-side pixels (auto resize) */
 };
 
-/* ══════════════════════ 인증 ══════════════════════ */
+/* ══════════════════════ AUTH ══════════════════════ */
 let accessToken = null, myEmail = "";
 let tokenClient = null;
 
 const $ = id => document.getElementById(id);
 const toast = msg => {
   const t = $("toast"); t.textContent = msg; t.classList.add("show");
-  clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove("show"), 3200);
+  const dur = /fail|Fail|error|Error|⚠/.test(msg) ? 8000 : 3200;
+  clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove("show"), dur);
 };
 
 const initAuth = () => {
@@ -253,7 +257,14 @@ const initAuth = () => {
     client_id: CONFIG.clientId,
     scope: "https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/userinfo.email",
     callback: (resp) => {
-      if (resp.error){ toast("로그인 실패: " + resp.error); return; }
+      if (resp.error){ toast("Sign-in failed: " + resp.error); return; }
+      /* If the Drive checkbox was left unchecked on consent, the token lacks scope → re-request */
+      if (google.accounts.oauth2.hasGrantedAllScopes &&
+          !google.accounts.oauth2.hasGrantedAllScopes(resp, "https://www.googleapis.com/auth/drive")){
+        toast("⚠ Please check the 'Google Drive' checkbox on the consent screen. Signing you in again…");
+        setTimeout(() => tokenClient.requestAccessToken({ prompt: "consent" }), 1800);
+        return;
+      }
       accessToken = resp.access_token;
       fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
         headers: { Authorization: "Bearer " + accessToken }
@@ -269,10 +280,10 @@ const initAuth = () => {
         }
         $("lockScreen").style.display = "none";
         $("panel").style.display = "block";
-        $("whoAmI").innerHTML = "로그인: <b>" + myEmail + "</b>";
+        $("whoAmI").innerHTML = "Signed in: <b>" + myEmail + "</b>";
         loadAll();
       })
-      .catch(() => toast("계정 정보를 가져오지 못했습니다"));
+      .catch(() => toast("Could not retrieve account info"));
     }
   });
 };
@@ -280,7 +291,7 @@ const initAuth = () => {
 $("signInBtn").addEventListener("click", () => {
   if (!tokenClient){
     if (window.google && google.accounts) initAuth();
-    else { toast("Google 로그인 로딩 중… 잠시 후 다시 눌러주세요"); return; }
+    else { toast("Google sign-in is still loading… please try again in a moment."); return; }
   }
   $("deniedMsg").style.display = "none";
   tokenClient.requestAccessToken();
@@ -294,7 +305,7 @@ $("refreshBtn").addEventListener("click", () => loadAll());
 
 window.addEventListener("load", () => { if (window.google && google.accounts) initAuth(); });
 
-/* ══════════════════════ Drive API 헬퍼 ══════════════════════ */
+/* ══════════════════════ DRIVE API HELPERS ══════════════════════ */
 const authHeaders = () => ({ Authorization: "Bearer " + accessToken });
 
 const listFolder = (folderId) =>
@@ -302,15 +313,30 @@ const listFolder = (folderId) =>
     + "?q=" + encodeURIComponent("'" + folderId + "' in parents and trashed=false")
     + "&fields=" + encodeURIComponent("files(id,name,mimeType)")
     + "&pageSize=1000", { headers: authHeaders() })
-  .then(r => { if (!r.ok) throw new Error("목록 읽기 실패 (" + r.status + ")"); return r.json(); })
+  .then(r => {
+    if (!r.ok){
+      return r.json().catch(() => ({})).then(d => {
+        const g = d && d.error ? d.error : {};
+        let hint = "";
+        if (r.status === 403 && /insufficient/i.test(g.message || "")) 
+          hint = " → Sign out, sign in again, and check the Drive checkbox on the consent screen.";
+        else if (r.status === 403 && /not configured|disabled|has not been used/i.test(g.message || ""))
+          hint = " → Make sure the Google Drive API is enabled in this project (must be the same project as the OAuth client).";
+        else if (r.status === 404)
+          hint = " → Check the folder ID.";
+        throw new Error("Failed to load file list " + r.status + (g.message ? " · " + g.message : "") + hint);
+      });
+    }
+    return r.json();
+  })
   .then(d => d.files || []);
 
 const deleteFile = (id) =>
   fetch("https://www.googleapis.com/drive/v3/files/" + id, {
     method: "DELETE", headers: authHeaders()
-  }).then(r => { if (!r.ok && r.status !== 404) throw new Error("삭제 실패 (" + r.status + ")"); });
+  }).then(r => { if (!r.ok && r.status !== 404) throw new Error("Delete failed (" + r.status + ")"); });
 
-/* multipart 업로드 (진행률 표시를 위해 XHR 사용) */
+/* multipart upload (XHR for progress reporting) */
 const uploadFile = (name, mime, blob, folderId, onProgress) => new Promise((resolve, reject) => {
   const meta = { name: name, parents: [folderId] };
   const boundary = "claire" + Date.now();
@@ -328,16 +354,16 @@ const uploadFile = (name, mime, blob, folderId, onProgress) => new Promise((reso
   xhr.upload.onprogress = e => { if (e.lengthComputable && onProgress) onProgress(e.loaded / e.total); };
   xhr.onload = () => {
     if (xhr.status >= 200 && xhr.status < 300) resolve(JSON.parse(xhr.responseText));
-    else reject(new Error("업로드 실패 (" + xhr.status + ")"));
+    else reject(new Error("Upload failed (" + xhr.status + ")"));
   };
-  xhr.onerror = () => reject(new Error("네트워크 오류"));
+  xhr.onerror = () => reject(new Error("Network error"));
   xhr.send(body);
 });
 
 const thumbUrl = (id, w) =>
   "https://drive.google.com/thumbnail?id=" + id + "&sz=w" + (w || 400) + "&t=" + Date.now();
 
-/* ══════════════════════ WebP 변환 ══════════════════════ */
+/* ══════════════════════ WEBP CONVERSION ══════════════════════ */
 const toWebp = (file) => new Promise((resolve, reject) => {
   const url = URL.createObjectURL(file);
   const img = new Image();
@@ -349,24 +375,32 @@ const toWebp = (file) => new Promise((resolve, reject) => {
     c.width = w; c.height = h;
     c.getContext("2d").drawImage(img, 0, 0, w, h);
     URL.revokeObjectURL(url);
-    c.toBlob(b => b ? resolve(b) : reject(new Error("WebP 변환 실패")), "image/webp", CONFIG.webpQuality);
+    c.toBlob(b => b ? resolve(b) : reject(new Error("WebP conversion failed")), "image/webp", CONFIG.webpQuality);
   };
-  img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("이미지를 읽을 수 없습니다 (HEIC는 jpg/png로 변환 후 업로드)")); };
+  img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Cannot read this image (convert HEIC to jpg/png first)")); };
   img.src = url;
 });
 
-/* ══════════════════════ 데이터 로드 & 렌더 ══════════════════════ */
+/* ══════════════════════ LOAD & RENDER ══════════════════════ */
 let imageFiles = [], videoFiles = [];
 
+const showLoadError = (msg) => {
+  const html = '<div class="frame" style="grid-column:1/-1;padding:18px;font-size:13px;'
+    + 'line-height:1.8;color:var(--err)">⚠ ' + msg
+    + '<br><span style="color:var(--muted)">After fixing, press [Refresh] at the top right.</span></div>';
+  $("cardGrid").innerHTML = html;
+  $("vidGrid").innerHTML = html;
+};
+
 const loadAll = () => {
-  toast("불러오는 중…");
+  toast("Loading…");
   Promise.all([listFolder(CONFIG.imagesFolder), listFolder(CONFIG.videosFolder)])
     .then(res => {
       imageFiles = res[0]; videoFiles = res[1];
       renderCards(); renderVideos();
-      toast("불러오기 완료");
+      toast("Loaded");
     })
-    .catch(e => toast(e.message));
+    .catch(e => { showLoadError(e.message); toast(e.message); });
 };
 
 const cardMap = () => {
@@ -380,7 +414,7 @@ const cardMap = () => {
   return map;
 };
 
-/* ── 포토카드 렌더 ── */
+/* ── Photocards ── */
 const renderCards = () => {
   const grid = $("cardGrid");
   grid.innerHTML = "";
@@ -389,16 +423,16 @@ const renderCards = () => {
 
   nums.forEach(n => grid.appendChild(buildCardEditor(n, map[n])));
 
-  /* 새 카드 추가 */
+  /* Add new card */
   const nextNo = nums.length ? Math.max.apply(null, nums) + 1 : 1;
   const add = document.createElement("div");
   add.className = "add-card";
   add.innerHTML =
-    '<p class="add-title">＋ 새 카드 추가</p>' +
-    '<div class="add-row">카드 번호 <input type="number" min="1" value="' + nextNo + '" id="newCardNo"></div>' +
+    '<p class="add-title">＋ Add new card</p>' +
+    '<div class="add-row">Card No. <input type="number" min="1" value="' + nextNo + '" id="newCardNo"></div>' +
     '<div class="slot-btns">' +
-      '<button class="up-btn" id="newFrontBtn">앞면 업로드</button>' +
-      '<button class="up-btn" id="newBackBtn">뒷면 업로드</button>' +
+      '<button class="up-btn" id="newFrontBtn">Upload front</button>' +
+      '<button class="up-btn" id="newBackBtn">Upload back</button>' +
     '</div>' +
     '<p class="slot-status" id="newCardStatus"></p>';
   grid.appendChild(add);
@@ -414,7 +448,7 @@ const buildCardEditor = (n, entry) => {
   el.innerHTML =
     '<div class="edit-head">' +
       '<span class="edit-no">Card No. ' + String(n).padStart(2, "0") + '</span>' +
-      '<button class="del-card">카드 전체 삭제</button>' +
+      '<button class="del-card">Delete entire card</button>' +
     '</div>' +
     '<div class="sides">' +
       slotHtml("front", entry.front) +
@@ -428,27 +462,27 @@ const buildCardEditor = (n, entry) => {
       pickAndUploadImage(n, side, status, slot));
     const delBtn = slot.querySelector(".js-del");
     if (delBtn) delBtn.addEventListener("click", () => {
-      if (!confirm(side + "_" + n + " 을(를) 삭제할까요?")) return;
-      status.textContent = "삭제 중…";
+      if (!confirm("Delete " + side + "_" + n + "?")) return;
+      status.textContent = "Deleting…";
       deleteFile(entry[side].id)
-        .then(() => { toast(side + "_" + n + " 삭제됨"); loadAll(); })
+        .then(() => { toast(side + "_" + n + " deleted"); loadAll(); })
         .catch(e => { status.textContent = e.message; status.className = "slot-status err"; });
     });
   });
 
   el.querySelector(".del-card").addEventListener("click", () => {
-    if (!confirm("카드 " + n + "의 앞·뒷면을 모두 삭제할까요?")) return;
+    if (!confirm("Delete BOTH the front and back of card " + n + "?")) return;
     const jobs = [];
     if (entry.front) jobs.push(deleteFile(entry.front.id));
     if (entry.back)  jobs.push(deleteFile(entry.back.id));
-    Promise.all(jobs).then(() => { toast("카드 " + n + " 삭제됨"); loadAll(); })
+    Promise.all(jobs).then(() => { toast("Card " + n + " deleted"); loadAll(); })
       .catch(e => toast(e.message));
   });
   return el;
 };
 
 const slotHtml = (side, file) => {
-  const label = side === "front" ? "Front · 앞면" : "Back · 뒷면";
+  const label = side === "front" ? "Front" : "Back";
   const img = file
     ? '<img src="' + thumbUrl(file.id, 400) + '" alt="">'
     : "";
@@ -457,17 +491,17 @@ const slotHtml = (side, file) => {
       '<p class="slot-label">' + label + '</p>' +
       '<div class="slot-img ' + (file ? "" : "empty") + '">' + img + '</div>' +
       '<div class="slot-btns">' +
-        '<button class="up-btn js-up">' + (file ? "교체" : "업로드") + '</button>' +
-        (file ? '<button class="up-btn danger js-del">삭제</button>' : "") +
+        '<button class="up-btn js-up">' + (file ? "Replace" : "Upload") + '</button>' +
+        (file ? '<button class="up-btn danger js-del">Delete</button>' : "") +
       '</div>' +
       '<div class="prog"><i></i></div>' +
       '<p class="slot-status"></p>' +
     '</div>');
 };
 
-/* 파일 선택 → WebP 변환 → 같은 이름 기존 파일 삭제 → 업로드 */
+/* pick file → convert to WebP → delete same-named old file → upload (= replace) */
 const pickAndUploadImage = (n, side, statusEl, slotEl) => {
-  if (!n || n < 1){ toast("올바른 카드 번호를 입력하세요"); return; }
+  if (!n || n < 1){ toast("Please enter a valid card number"); return; }
   const input = document.createElement("input");
   input.type = "file";
   input.accept = "image/*";
@@ -478,11 +512,11 @@ const pickAndUploadImage = (n, side, statusEl, slotEl) => {
     const bar = slotEl ? slotEl.querySelector(".prog i") : null;
     const setS = (msg, cls) => { statusEl.textContent = msg; statusEl.className = "slot-status " + (cls || ""); };
 
-    setS("WebP 변환 중…");
+    setS("Converting to WebP…");
     toWebp(file)
       .then(blob => {
-        setS("업로드 중… (" + Math.round(blob.size / 1024) + " KB)");
-        /* 같은 번호·면의 기존 파일(확장자 무관) 먼저 삭제 = 교체 */
+        setS("Uploading… (" + Math.round(blob.size / 1024) + " KB)");
+        /* delete any existing file for this number/side (any extension) first = replace */
         const olds = imageFiles.filter(f =>
           new RegExp("^" + side + "_" + n + "\\.(webp|jpe?g|png|gif)$", "i").test(f.name));
         return Promise.all(olds.map(f => deleteFile(f.id)))
@@ -490,8 +524,8 @@ const pickAndUploadImage = (n, side, statusEl, slotEl) => {
             p => { if (bar) bar.style.width = Math.round(p * 100) + "%"; }));
       })
       .then(() => {
-        setS("완료!", "ok");
-        toast(name + " 업로드 완료");
+        setS("Done!", "ok");
+        toast(name + " uploaded");
         setTimeout(loadAll, 600);
       })
       .catch(e => setS(e.message, "err"));
@@ -499,7 +533,7 @@ const pickAndUploadImage = (n, side, statusEl, slotEl) => {
   input.click();
 };
 
-/* ── 비디오 렌더 ── */
+/* ── Videos ── */
 const renderVideos = () => {
   const grid = $("vidGrid");
   grid.innerHTML = "";
@@ -519,8 +553,8 @@ const renderVideos = () => {
         '<span class="tag">Clip ' + String(v.n).padStart(2, "0") + ' · ' + v.file.name + '</span>' +
       '</div>' +
       '<div class="slot-btns" style="margin-top:10px">' +
-        '<button class="up-btn js-rep">교체</button>' +
-        '<button class="up-btn danger js-del">삭제</button>' +
+        '<button class="up-btn js-rep">Replace</button>' +
+        '<button class="up-btn danger js-del">Delete</button>' +
       '</div>' +
       '<div class="prog"><i></i></div>' +
       '<p class="slot-status"></p>';
@@ -528,9 +562,9 @@ const renderVideos = () => {
     const bar = el.querySelector(".prog i");
     el.querySelector(".js-rep").addEventListener("click", () => pickAndUploadVideo(v.n, status, bar));
     el.querySelector(".js-del").addEventListener("click", () => {
-      if (!confirm(v.file.name + " 을(를) 삭제할까요?")) return;
-      status.textContent = "삭제 중…";
-      deleteFile(v.file.id).then(() => { toast("삭제됨"); loadAll(); })
+      if (!confirm("Delete " + v.file.name + "?")) return;
+      status.textContent = "Deleting…";
+      deleteFile(v.file.id).then(() => { toast("Deleted"); loadAll(); })
         .catch(e => { status.textContent = e.message; status.className = "slot-status err"; });
     });
     grid.appendChild(el);
@@ -540,9 +574,9 @@ const renderVideos = () => {
   const add = document.createElement("div");
   add.className = "add-card";
   add.innerHTML =
-    '<p class="add-title">＋ 새 영상 추가</p>' +
-    '<div class="add-row">영상 번호 <input type="number" min="1" value="' + nextNo + '" id="newVidNo"></div>' +
-    '<div class="slot-btns"><button class="up-btn" id="newVidBtn">영상 업로드</button></div>' +
+    '<p class="add-title">＋ Add new video</p>' +
+    '<div class="add-row">Video No. <input type="number" min="1" value="' + nextNo + '" id="newVidNo"></div>' +
+    '<div class="slot-btns"><button class="up-btn" id="newVidBtn">Upload video</button></div>' +
     '<div class="prog" style="width:70%"><i id="newVidBar"></i></div>' +
     '<p class="slot-status" id="newVidStatus"></p>';
   grid.appendChild(add);
@@ -551,7 +585,7 @@ const renderVideos = () => {
 };
 
 const pickAndUploadVideo = (n, statusEl, bar) => {
-  if (!n || n < 1){ toast("올바른 영상 번호를 입력하세요"); return; }
+  if (!n || n < 1){ toast("Please enter a valid video number"); return; }
   const input = document.createElement("input");
   input.type = "file";
   input.accept = "video/mp4,video/quicktime,video/webm,video/x-m4v";
@@ -563,15 +597,15 @@ const pickAndUploadVideo = (n, statusEl, bar) => {
     const name = "video_" + n + "." + ext;
     const setS = (msg, cls) => { statusEl.textContent = msg; statusEl.className = "slot-status " + (cls || ""); };
 
-    setS("업로드 중… (" + (file.size / 1048576).toFixed(1) + " MB)");
+    setS("Uploading… (" + (file.size / 1048576).toFixed(1) + " MB)");
     const olds = videoFiles.filter(f =>
       new RegExp("^video_" + n + "\\.(mp4|mov|m4v|webm)$", "i").test(f.name));
     Promise.all(olds.map(f => deleteFile(f.id)))
       .then(() => uploadFile(name, file.type || "video/mp4", file, CONFIG.videosFolder,
         p => { if (bar) bar.style.width = Math.round(p * 100) + "%"; }))
       .then(() => {
-        setS("완료! 썸네일은 Drive가 곧 생성합니다", "ok");
-        toast(name + " 업로드 완료");
+        setS("Done! Drive will generate the thumbnail shortly", "ok");
+        toast(name + " uploaded");
         setTimeout(loadAll, 800);
       })
       .catch(e => setS(e.message, "err"));
